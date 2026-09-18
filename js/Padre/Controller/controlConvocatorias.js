@@ -245,10 +245,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       setCardBusy(card, true);
 
       try {
-        const updated = await aceptarConvocatoria(
-          convocationId,
-          card.dataset.estudianteEncargadoId
-        );
+        const updated = await aceptarConvocatoria(convocationId);
         applyState(card, updated, true);
         showResult('Convocatoria aceptada', 'Tu aceptación fue guardada en el sistema correctamente.');
       } catch (error) {
@@ -286,7 +283,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const updated = await posponerConvocatoria(
         convocationId,
-        card.dataset.estudianteEncargadoId,
         dateInput.value,
         timeInput.value,
         reasonInput.value

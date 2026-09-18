@@ -23,6 +23,11 @@ const ROLES_DOCENTE = [
   "DOCENTE ACADEMICO"
 ];
 
+const ROLES_ADMINISTRATIVOS = [
+  "ADMINISTRADOR",
+  "RECEPCIONISTA"
+];
+
 // Llamadas a la API
 async function pedirAuth(ruta, cuerpo) {
   let respuesta;
@@ -68,13 +73,12 @@ async function consultarApi(ruta) {
 }
 
 
-// Inicio de sesión
+// Inicio de sesión unificado
 
 /**
- * Valida las credenciales y prepara la sesión del rol que corresponda.
+ * Valida las credenciales y prepara la sesión según el rol en V_USUARIOS_AUTH.
  *
- * @returns {Promise<{tipo: string, destino: string}>} adónde debe ir
- *          la aplicación después de iniciar sesión.
+ * @returns {Promise<{tipo: string, destino: string}>} Adónde debe ir la app.
  */
 export async function iniciarSesion(correo, password) {
   const email = String(correo || "").trim().toLowerCase();
@@ -89,36 +93,39 @@ export async function iniciarSesion(correo, password) {
 
   const credenciales = { email, password };
 
-  const personal = await pedirAuth("/auth/login", credenciales);
+  // 1. Consulta la API Auth (Puerto 8081 - Busca en V_USUARIOS_AUTH)
+  const auth = await pedirAuth("/auth/login", credenciales);
 
-  if (personal.ok) {
-    const rol = String(personal.datos?.rol || "").toUpperCase();
-
-    if (!ROLES_DOCENTE.includes(rol)) {
-      throw new Error(
-        "Esta cuenta pertenece al personal administrativo. " +
-        "Ingrese desde el sitio web."
-      );
+  if (!auth.ok) {
+    if (auth.estado === 401) {
+      throw new Error("El correo o la contraseña son incorrectos.");
     }
-
-    guardarSesionDocente(personal.datos, email);
-    return { tipo: "docente", destino: "Docentes/index.html" };
+    throw new Error(auth.mensaje || "Error al verificar las credenciales.");
   }
 
-  if (personal.estado === 401) {
-    throw new Error("El correo o la contraseña son incorrectos.");
-  }
+  const rol = String(auth.datos?.rol || "").toUpperCase();
 
-  const encargado = await pedirAuth("/usuarios/inicio-sesion-encargado", credenciales);
-
-  if (!encargado.ok) {
+  // 2. Bloqueo para Administradores/Recepcionistas (deben usar el portal web)
+  if (ROLES_ADMINISTRATIVOS.includes(rol)) {
     throw new Error(
-      encargado.mensaje || "El correo o la contraseña son incorrectos."
+      "Esta cuenta pertenece al personal administrativo. " +
+      "Ingrese desde el sitio web correspondiente."
     );
   }
 
-  await guardarSesionPadre(encargado.datos, email);
-  return { tipo: "encargado", destino: "Padres/index.html" };
+  // 3. Flujo para Docentes
+  if (ROLES_DOCENTE.includes(rol)) {
+    guardarSesionDocente(auth.datos, email);
+    return { tipo: "docente", destino: "Docentes/index.html" };
+  }
+
+  // 4. Flujo para Estudiantes / Encargados (ingresan con credenciales de estudiante)
+  if (rol === "ESTUDIANTE" || rol === "ENCARGADO") {
+    await guardarSesionPadre(auth.datos, email);
+    return { tipo: "encargado", destino: "Padres/index.html" };
+  }
+
+  throw new Error("El rol asociado a esta cuenta no tiene permisos de acceso.");
 }
 
 
@@ -141,7 +148,8 @@ function guardarSesionDocente(datos, email) {
 
 async function guardarSesionPadre(datos, email) {
   limpiarSesion();
-  guardarDatosComunes(datos);
+  // Se fuerza el rol activo a ENCARGADO para la sesión local
+  guardarDatosComunes({ ...datos, rol: "ENCARGADO" });
 
   const idEstudiante = Number(datos.idUsuario);
   let estudiante = null;
@@ -149,7 +157,6 @@ async function guardarSesionPadre(datos, email) {
   try {
     estudiante = await consultarApi(`/estudiantes/${idEstudiante}`);
   } catch (error) {
-
     console.error("No fue posible cargar los datos del estudiante.", error);
   }
 
