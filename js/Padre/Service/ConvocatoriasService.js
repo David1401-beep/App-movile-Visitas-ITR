@@ -1,3 +1,4 @@
+import { compararCitas } from "../../ordenCitas.js";
 const hostApi = ["", "localhost", "127.0.0.1"].includes(window.location.hostname)
   ? "localhost"
   : window.location.hostname;
@@ -7,8 +8,13 @@ const CLAVE_DATOS_SESION = "visitasITR.sesionPadre";
 const MARCADOR_SOLICITUD_PADRE = "[SOLICITUD_PADRE]";
 const LIMITE_OBSERVACIONES = 300;
 
+// Uso estos textos para saber cuál de los dos mandó la última propuesta.
+const PROPUESTA_ENCARGADO = "Encargado propone otra fecha:";
+const PROPUESTA_DOCENTE = "Docente propone otra fecha:";
+
 async function solicitarApi(ruta, opciones = {}) {
   const configuracion = {
+    credentials: "include",
     ...opciones,
     headers: {
       Accept: "application/json",
@@ -114,8 +120,40 @@ export function convertirConvocatoria(cita) {
     estudianteNombre: cita.nombreEstudiante || "Estudiante no disponible",
     docenteNombre: cita.nombreDocente || "Docente no disponible",
     estado: normalizarEstado(cita.citEstado),
-    estadoApi: cita.citEstado
+    estadoApi: cita.citEstado,
+    // Para saber a quién le toca contestar.
+    propuestaDe: quienPropuso(cita.citObservaciones),
+    motivoPropuesta: motivoDeLaPropuesta(cita.citObservaciones)
   };
+}
+
+// Me dice quién propuso la fecha: el encargado, el docente, o nadie.
+function quienPropuso(observaciones) {
+  const texto = String(observaciones || "");
+
+  if (texto.includes(PROPUESTA_ENCARGADO)) {
+    return "ENCARGADO";
+  }
+
+  if (texto.includes(PROPUESTA_DOCENTE)) {
+    return "DOCENTE";
+  }
+
+  return "";
+}
+
+// Me quedo solo con el motivo y le quito el texto de quién propuso.
+function motivoDeLaPropuesta(observaciones) {
+  const texto = String(observaciones || "");
+  const marcador = texto.includes(PROPUESTA_ENCARGADO)
+    ? PROPUESTA_ENCARGADO
+    : texto.includes(PROPUESTA_DOCENTE) ? PROPUESTA_DOCENTE : "";
+
+  if (!marcador) {
+    return "";
+  }
+
+  return texto.slice(texto.indexOf(marcador) + marcador.length).trim();
 }
 
 export async function obtenerConvocatoriasPadre() {
@@ -139,9 +177,7 @@ export async function obtenerConvocatoriasPadre() {
     .filter(cita => !cita.citObservaciones?.startsWith(MARCADOR_SOLICITUD_PADRE))
     .filter(cita => idsRelacion.has(Number(cita.idEstudianteEncargado)))
     .map(convertirConvocatoria)
-    .sort((primera, segunda) =>
-      (segunda.fechaReunion || "").localeCompare(primera.fechaReunion || "")
-    );
+    .sort((primera, segunda) => compararCitas(primera, segunda, true));
 }
 
 
@@ -177,18 +213,17 @@ export async function posponerConvocatoria(idCita, nuevaFecha, nuevaHora, motivo
     throw new Error("Debe indicar la nueva fecha y hora.");
   }
 
-  const observaciones = motivoReprogramacion?.trim()
-    ? `Encargado propone otra fecha: ${motivoReprogramacion.trim()}`.slice(0, LIMITE_OBSERVACIONES)
-    : undefined;
+  // Pido el motivo sí o sí, porque es lo que el docente lee para decidir.
+  if (!motivoReprogramacion || !motivoReprogramacion.trim()) {
+    throw new Error("Debe explicar por qué no puede asistir.");
+  }
 
   const cuerpo = {
     citEstado: "POSPUESTA",
-    citFechaReunion: `${nuevaFecha}T${nuevaHora}:00`
+    citFechaReunion: `${nuevaFecha}T${nuevaHora}:00`,
+    citObservaciones:
+      `${PROPUESTA_ENCARGADO} ${motivoReprogramacion.trim()}`.slice(0, LIMITE_OBSERVACIONES)
   };
-
-  if (observaciones) {
-    cuerpo.citObservaciones = observaciones;
-  }
 
   const citaActualizada = await solicitarApi(
     `/citas-reuniones/${encodeURIComponent(idCita)}`,

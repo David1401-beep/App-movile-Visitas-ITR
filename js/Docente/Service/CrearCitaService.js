@@ -11,6 +11,9 @@ const LIMITE_OBSERVACIONES = 300;
 async function solicitarApi(ruta, opciones = {}) {
   const configuracion = {
     ...opciones,
+    // Lo pongo despues del spread para que no se me pierda en ninguna
+    // llamada. Sin esto no va la cookie y la API responde 401.
+    credentials: "include",
     headers: {
       Accept: "application/json",
       ...(opciones.body ? { "Content-Type": "application/json" } : {}),

@@ -9,6 +9,7 @@ async function solicitarApi(ruta) {
 
   try {
     respuesta = await fetch(`${API_BASE_URL}${ruta}`, {
+      credentials: "include",
       headers: { Accept: "application/json" }
     });
   } catch (error) {
@@ -33,14 +34,8 @@ async function solicitarApi(ruta) {
     : contenido;
 }
 
-/**
- * Avisos visibles, del más reciente al más antiguo.
- *
- * El endpoint /comunicados devuelve solo los activos, así que los
- * retirados por el docente no llegan aquí.
- *
- * @param {number} limite cuántos avisos devolver como máximo.
- */
+// Trae los avisos del más nuevo al más viejo. El limite es cuántos quiero.
+// La API solo manda los activos, así que los que el docente retiró no llegan.
 export async function obtenerAvisos(limite = 3) {
   const comunicados = await solicitarApi("/comunicados");
 

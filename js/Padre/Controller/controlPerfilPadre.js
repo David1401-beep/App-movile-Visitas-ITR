@@ -71,9 +71,11 @@ async function agregarResumenCitas() {
   }
 }
 
-// La sesión se borra antes de que el navegador siga el enlace.
-btnCerrarSesion?.addEventListener("click", function () {
-  limpiarSesion();
+// Espero a que el servidor cierre la sesión antes de salir de la pantalla.
+btnCerrarSesion?.addEventListener("click", async function (evento) {
+  evento.preventDefault();
+  await limpiarSesion();
+  window.location.replace("../inicioSesion.html");
 });
 
 function escribir(elemento, valor) {

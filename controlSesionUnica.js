@@ -1,10 +1,10 @@
 import {
   iniciarSesion,
-  haySesionActiva,
+  obtenerSesion,
   destinoSegunRol
 } from "./js/sesionService.js";
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
   const formulario = document.getElementById("formulario-inicio-sesion");
   const inputCorreo = document.getElementById("correo-usuario");
   const inputPassword = document.getElementById("contrasena-usuario");
@@ -15,8 +15,11 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
-  if (haySesionActiva()) {
-    window.location.replace(destinoSegunRol());
+  // Si ya hay sesión activa, no le vuelvo a pedir que inicie.
+  const sesionVigente = await obtenerSesion();
+
+  if (sesionVigente) {
+    window.location.replace(destinoSegunRol(sesionVigente.rol));
     return;
   }
 

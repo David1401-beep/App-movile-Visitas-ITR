@@ -82,6 +82,13 @@ function construirAcciones(solicitud) {
     `;
   }
 
+  // Ya mandó su propuesta y no puede hacer nada hasta que el docente conteste.
+  if (solicitud.esperandoDocente) {
+    return `<span class="solicitud-dato text-secondary">
+         Se envió su propuesta. Esperando la respuesta del docente.
+       </span>`;
+  }
+
   return `<span class="solicitud-dato text-secondary">
        El docente ya respondió esta solicitud.
      </span>`;

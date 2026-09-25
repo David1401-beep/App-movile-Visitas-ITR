@@ -24,9 +24,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     return `${hour % 12 || 12}:${minutes} ${hour >= 12 ? 'P.M' : 'A.M'}`;
   };
 
-  // PENDIENTE y POSPUESTA se muestran juntas en esta lista; el badge
-  // distingue si es una solicitud nueva o una reprogramación del encargado.
-  const claseBadgeEstado = (estadoApi) => (estadoApi === 'POSPUESTA' ? 'bg-info text-dark' : 'bg-warning text-dark');
+  // Si el encargado mandó otra fecha le pongo Propuesta, para que no se
+  // confunda con una solicitud nueva.
+  const claseBadgeEstado = (request) =>
+    request.esPropuesta ? 'bg-info text-dark' : 'bg-warning text-dark';
+
+  const textoBadgeEstado = (request) =>
+    request.esPropuesta ? 'Propuesta' : request.estado;
 
   const renderRequests = (requests) => {
     requestList.innerHTML = '';
@@ -50,40 +54,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         fecha: request.fecha,
         hora: request.hora
       });
+      // Le mando los datos para mostrarlos en la pantalla de posponer.
       const postponeParameters = new URLSearchParams({
         solicitud: String(request.idCita),
-        nombre: request.nombreEncargado
+        nombre: request.nombreEncargado,
+        estudiante: request.nombreEstudiante,
+        motivo: request.motivo,
+        fecha: request.fecha,
+        hora: request.hora,
+        propuesta: request.esPropuesta ? '1' : '',
+        motivoPropuesta: request.motivoPropuesta || ''
       });
 
       requestList.innerHTML += `
         <article class="request-summary-card" id="tarjeta-solicitud-${request.idCita}"
           data-id-cita="${request.idCita}">
-          <div class="d-flex justify-content-between align-items-start">
-            <h2 class="request-summary-student fw-bold mb-0" id="nombre-solicitante-${request.idCita}">
+          <div class="request-summary-head">
+            <h2 class="request-summary-student" id="nombre-solicitante-${request.idCita}">
               ${escapeHtml(request.nombreEncargado)}
             </h2>
-            <span class="badge ${claseBadgeEstado(request.estadoApi)}">${escapeHtml(request.estado)}</span>
+            <span class="badge ${claseBadgeEstado(request)}">${escapeHtml(textoBadgeEstado(request))}</span>
           </div>
 
-          <dl class="request-summary-details" id="detalles-solicitud-${request.idCita}">
-            <div id="contenedor-estudiante-${request.idCita}">
-              <dt id="etiqueta-estudiante-${request.idCita}">Estudiante:</dt>
-              <dd id="estudiante-solicitud-${request.idCita}">${escapeHtml(request.nombreEstudiante)}</dd>
-            </div>
-            <div id="contenedor-motivo-${request.idCita}">
-              <dt id="etiqueta-motivo-${request.idCita}">Motivo:</dt>
-              <dd id="motivo-solicitud-${request.idCita}">${escapeHtml(request.motivo)}</dd>
-            </div>
-            <div id="contenedor-fecha-${request.idCita}">
-              <dt id="etiqueta-fecha-${request.idCita}">Fecha:</dt>
-              <dd id="fecha-solicitud-${request.idCita}">${escapeHtml(formatDate(request.fecha))}</dd>
-            </div>
-            <div id="contenedor-hora-${request.idCita}">
-              <dt id="etiqueta-hora-${request.idCita}">Hora:</dt>
-              <dd id="hora-solicitud-${request.idCita}">${escapeHtml(formatTime(request.hora))}</dd>
-            </div>
-          </dl>
-
+          <p class="request-summary-line" id="estudiante-solicitud-${request.idCita}">
+            <span>Estudiante</span> ${escapeHtml(request.nombreEstudiante)}
+          </p>
+          <p class="request-summary-line" id="motivo-solicitud-${request.idCita}">
+            <span>Motivo</span> ${escapeHtml(request.motivo)}
+          </p>
+          <p class="request-summary-line" id="cuando-solicitud-${request.idCita}">
+            <span>${request.esPropuesta ? 'Fecha propuesta' : 'Fecha'}</span>
+            ${escapeHtml(formatDate(request.fecha))} · ${escapeHtml(formatTime(request.hora))}
+          </p>
           <div class="request-summary-actions" id="acciones-solicitud-${request.idCita}">
             <a class="request-list-action request-list-review" id="btn-revisar-solicitud-${request.idCita}"
               href="revisarSolicitud.html?${reviewParameters.toString()}">

@@ -1,7 +1,12 @@
+import { compararCitas } from "../../ordenCitas.js";
 import { solicitarApi, obtenerDocenteActivo } from "./CrearCitaService.js";
 
 const MARCADOR_SOLICITUD_PADRE = "[SOLICITUD_PADRE]";
 const LIMITE_OBSERVACIONES = 300;
+
+// Con estos textos sé quién mandó la última propuesta.
+const PROPUESTA_ENCARGADO = "Encargado propone otra fecha:";
+const PROPUESTA_DOCENTE = "Docente propone otra fecha:";
 
 function separarFechaHora(fechaReunion) {
   const [fecha = "", horaCompleta = ""] = String(fechaReunion || "").split("T");
@@ -24,9 +29,7 @@ export async function obtenerSolicitudesDocente() {
     )
     .map(convertirSolicitud)
     // Las más próximas primero: son las que el docente debe atender antes.
-    .sort((primera, segunda) =>
-      (primera.fechaReunion || "").localeCompare(segunda.fechaReunion || "")
-    );
+    .sort((primera, segunda) => compararCitas(primera, segunda, false));
 }
 
 export async function obtenerHistorialSolicitudes() {
@@ -39,9 +42,7 @@ export async function obtenerHistorialSolicitudes() {
   return (Array.isArray(citas) ? citas : [])
     .filter(cita => cita.citObservaciones?.startsWith(MARCADOR_SOLICITUD_PADRE))
     .map(convertirSolicitud)
-    .sort((primera, segunda) =>
-      (segunda.fechaReunion || "").localeCompare(primera.fechaReunion || "")
-    );
+    .sort((primera, segunda) => compararCitas(primera, segunda, false));
 }
 
 export async function obtenerSolicitudPorId(idCita) {
@@ -79,15 +80,21 @@ export async function posponerSolicitud(idCita, fecha, hora, justificacion) {
     throw new Error("Debe indicar la nueva fecha y hora.");
   }
 
+  const motivo = (justificacion || "").trim();
+
+  if (!motivo) {
+    throw new Error("Debe explicar por qué propone otra fecha.");
+  }
+
+  // Piso el texto anterior. Si no, queda el del encargado y su propuesta
+  // se sigue viendo como si fuera la de ahora.
   const cuerpo = {
     citEstado: "POSPUESTA",
-    citFechaReunion: `${fecha}T${hora}:00`
+    citFechaReunion: `${fecha}T${hora}:00`,
+    citObservaciones:
+      `${MARCADOR_SOLICITUD_PADRE} ${PROPUESTA_DOCENTE} ${motivo}`
+        .slice(0, LIMITE_OBSERVACIONES)
   };
-
-  if (justificacion && justificacion.trim()) {
-    cuerpo.citObservaciones =
-      `${MARCADOR_SOLICITUD_PADRE} ${justificacion.trim()}`.slice(0, LIMITE_OBSERVACIONES);
-  }
 
   const cita = await solicitarApi(`/citas-reuniones/${encodeURIComponent(idCita)}`, {
     method: "PATCH",
@@ -130,8 +137,24 @@ function convertirSolicitud(cita) {
     horaTexto: formatearHora(fechaHora.hora),
 
     estado: nombresEstado[cita.citEstado] || cita.citEstado,
-    estadoApi: cita.citEstado
+    estadoApi: cita.citEstado,
+
+    // El encargado mandó otra fecha y falta que el docente conteste.
+    esPropuesta: String(cita.citObservaciones || "").includes(PROPUESTA_ENCARGADO),
+    motivoPropuesta: motivoDeLaPropuesta(cita.citObservaciones)
   };
+}
+
+// Me quedo solo con el motivo y le quito el texto de quién propuso.
+function motivoDeLaPropuesta(observaciones) {
+  const texto = String(observaciones || "");
+  const posicion = texto.indexOf(PROPUESTA_ENCARGADO);
+
+  if (posicion < 0) {
+    return "";
+  }
+
+  return texto.slice(posicion + PROPUESTA_ENCARGADO.length).trim();
 }
 
 function quitarMarcador(observaciones) {

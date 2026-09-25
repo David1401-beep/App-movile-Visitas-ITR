@@ -79,6 +79,47 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  // Muestra los datos del encargado, para no proponer a ciegas.
+  function mostrarResumen() {
+    const resumen = document.getElementById('resumen-solicitud');
+
+    if (!resumen) return;
+
+    const escapar = (valor) => String(valor ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+
+    const fecha = params.get('fecha');
+    const hora = params.get('hora');
+    const esPropuesta = params.get('propuesta') === '1';
+    const motivoPropuesta = params.get('motivoPropuesta');
+
+    resumen.innerHTML = `
+      <h2 class="postpone-summary-title">${escapar(params.get('nombre') || 'Encargado')}</h2>
+
+      <p class="postpone-summary-line">
+        <span>Estudiante</span> ${escapar(params.get('estudiante') || 'No disponible')}
+      </p>
+      <p class="postpone-summary-line">
+        <span>Motivo de la visita</span> ${escapar(params.get('motivo') || 'No disponible')}
+      </p>
+      <p class="postpone-summary-line">
+        <span>${esPropuesta ? 'Fecha que propuso' : 'Fecha solicitada'}</span>
+        ${escapar(fecha ? formatDate(fecha) : 'No disponible')}
+        · ${escapar(hora ? formatTime(hora) : '')}
+      </p>
+      ${esPropuesta && motivoPropuesta ? `
+      <p class="postpone-summary-note">
+        <span>No puede asistir</span> ${escapar(motivoPropuesta)}
+      </p>` : ''}
+    `;
+
+    resumen.hidden = false;
+  }
+
   const getToday = () => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -108,6 +149,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const hour = Number(hourValue);
     return `${hour % 12 || 12}:${minutes} ${hour >= 12 ? 'P.M.' : 'A.M.'}`;
   };
+
+  // Va aquí porque usa formatDate y formatTime, que están más arriba.
+  mostrarResumen();
 
   validateDateTime();
   dateInput.addEventListener('input', validateDateTime);

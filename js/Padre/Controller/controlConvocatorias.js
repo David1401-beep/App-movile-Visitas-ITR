@@ -32,6 +32,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     finalizada: 'Finalizada',
   };
 
+  // Cuando el docente contesta, la cita vuelve a pendiente. La marco
+  // distinto para que no parezca una convocatoria nueva.
+  const esReprogramacion = (convocatoria) =>
+    convocatoria.propuestaDe === 'DOCENTE' && convocatoria.estado === 'pendiente';
+
+  const etiquetaEstado = (convocatoria) =>
+    esReprogramacion(convocatoria)
+      ? 'Nueva propuesta'
+      : statusLabels[convocatoria.estado] || convocatoria.estado;
+
   const getCard = (convocationId) => document.getElementById(`convocatoria-${convocationId}`);
 
   const getToday = () => {
@@ -91,6 +101,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       article.dataset.estudianteId = String(convocatoria.idEstudiante || '');
       article.dataset.estudianteEncargadoId = String(convocatoria.idEstudianteEncargado || '');
       article.dataset.estado = convocatoria.estado;
+      article.dataset.propuestaDe = convocatoria.propuestaDe || '';
+      article.classList.toggle('is-rescheduled', esReprogramacion(convocatoria));
 
       article.innerHTML = `
         <div class="card-body" id="cuerpo-convocatoria-${id}">
@@ -98,8 +110,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             <h2 class="convocation-title fw-bold" id="asunto-convocatoria-${id}"
               data-api-field="asunto">${escapeHtml(convocatoria.asunto)}</h2>
             <span class="convocation-status" id="estado-convocatoria-${id}"
-              data-api-field="estado">${escapeHtml(statusLabels[convocatoria.estado] || convocatoria.estado)}</span>
+              data-api-field="estado">${escapeHtml(etiquetaEstado(convocatoria))}</span>
           </div>
+
+          ${esReprogramacion(convocatoria) ? `
+          <p class="convocation-notice" id="aviso-convocatoria-${id}">
+            <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+            El docente no pudo en la fecha que usted propuso y le propone esta.
+          </p>` : ''}
 
           <p class="convocation-data" id="fecha-convocatoria-${id}">
             <strong>Fecha:</strong>
@@ -110,8 +128,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             <time data-api-field="hora" datetime="${escapeHtml(convocatoria.hora)}">${escapeHtml(formatTime(convocatoria.hora))}</time>
           </p>
           <p class="convocation-data" id="descripcion-convocatoria-${id}">
-            <strong>Descripción:</strong>
-            <span data-api-field="descripcion">${escapeHtml(convocatoria.descripcion)}</span>
+            <strong data-api-field="descripcion-titulo">${
+              esReprogramacion(convocatoria) ? 'Motivo del docente:' : 'Descripción:'
+            }</strong>
+            <span data-api-field="descripcion">${escapeHtml(
+              esReprogramacion(convocatoria)
+                ? (convocatoria.motivoPropuesta || 'No indicó un motivo.')
+                : convocatoria.descripcion
+            )}</span>
           </p>
           <p class="convocation-data" id="estudiante-convocatoria-${id}">
             <strong>Estudiante convocado:</strong>
@@ -165,9 +189,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     const buttons = card.querySelectorAll('[data-action]');
 
     card.dataset.estado = status;
+
+    if (state.propuestaDe !== undefined) {
+      card.dataset.propuestaDe = state.propuestaDe || '';
+    }
+
+    const reprogramada = card.dataset.propuestaDe === 'DOCENTE' && status === 'pendiente';
+
     card.classList.toggle('is-accepted', status === 'aceptada');
     card.classList.toggle('is-postponed', status === 'pospuesta');
-    statusElement.textContent = statusLabels[status] || status;
+    card.classList.toggle('is-rescheduled', reprogramada);
+    statusElement.textContent = reprogramada
+      ? 'Nueva propuesta'
+      : statusLabels[status] || status;
+
+    // Cuando ya contestó, quito el aviso para que la tarjeta quede solo
+    // con el color del estado nuevo.
+    if (!reprogramada) {
+      card.querySelector('.convocation-notice')?.remove();
+
+      const titulo = card.querySelector('[data-api-field="descripcion-titulo"]');
+
+      if (titulo) {
+        titulo.textContent = 'Descripción:';
+      }
+
+      const descripcion = card.querySelector('[data-api-field="descripcion"]');
+
+      if (descripcion && (state.motivoPropuesta || state.descripcion)) {
+        descripcion.textContent = state.motivoPropuesta || state.descripcion;
+      }
+    }
 
     if (state.fecha && state.hora) {
       const dateElement = card.querySelector('[data-api-field="fecha"]');
@@ -178,6 +230,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       timeElement.textContent = formatTime(state.hora);
     }
 
+    // Solo responde cuando le toca: al posponer queda esperando al docente.
     buttons.forEach((button) => {
       button.disabled = status !== 'pendiente';
     });

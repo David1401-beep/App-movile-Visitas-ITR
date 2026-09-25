@@ -34,9 +34,7 @@ export async function obtenerAgendaDocente() {
   return agruparPorFecha(vigentes);
 }
 
-/**
- * Conteos para la cabecera de la pantalla.
- */
+// Los números que salen arriba en la pantalla.
 export async function obtenerResumenAgenda() {
   const docente = await obtenerDocenteActivo();
 

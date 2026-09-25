@@ -1,3 +1,4 @@
+import { compararCitas } from "../../ordenCitas.js";
 import {
   solicitarApi,
   obtenerSesionPadre,
@@ -7,6 +8,10 @@ import {
 
 const LIMITE_MOTIVO = 250;
 const LIMITE_OBSERVACIONES = 300;
+
+// Con este texto marco la propuesta del encargado, así sé que le toca
+// contestar al docente.
+const PROPUESTA_ENCARGADO = "Encargado propone otra fecha:";
 
 let solicitudesEnMemoria = [];
 
@@ -36,9 +41,7 @@ export async function obtenerMisSolicitudes() {
     .filter(cita => cita.citObservaciones?.startsWith(MARCADOR_SOLICITUD_PADRE))
     .filter(cita => idsRelacion.has(Number(cita.idEstudianteEncargado)))
     .map(convertirSolicitud)
-    .sort((primera, segunda) =>
-      (segunda.fechaReunion || "").localeCompare(primera.fechaReunion || "")
-    );
+    .sort((primera, segunda) => compararCitas(primera, segunda, true));
 
   return solicitudesEnMemoria;
 }
@@ -127,10 +130,13 @@ export async function posponerSolicitud(idCita, fecha, hora, justificacion) {
     throw new Error("Debe indicar el motivo de la reprogramación.");
   }
 
+  // La dejo en PENDIENTE porque ahora le toca al docente contestar.
   const cuerpo = {
-    citEstado: "POSPUESTA",
+    citEstado: "PENDIENTE",
     citFechaReunion: `${fecha}T${hora}:00`,
-    citObservaciones: `${MARCADOR_SOLICITUD_PADRE} ${motivo}`.slice(0, LIMITE_OBSERVACIONES)
+    citObservaciones:
+      `${MARCADOR_SOLICITUD_PADRE} ${PROPUESTA_ENCARGADO} ${motivo}`
+        .slice(0, LIMITE_OBSERVACIONES)
   };
 
   const citaActualizada = await solicitarApi(`/citas-reuniones/${idCita}`, {
@@ -210,8 +216,17 @@ function convertirSolicitud(cita) {
     estado: nombresEstado[cita.citEstado] || cita.citEstado,
     estadoApi: cita.citEstado,
 
-    editable: cita.citEstado === "PENDIENTE"
+    // Ya mandó su propuesta, ahora espera al docente.
+    esperandoDocente: esperaAlDocente(cita),
+
+    // Solo puede editarla mientras el docente no la haya tocado.
+    editable: cita.citEstado === "PENDIENTE" && !esperaAlDocente(cita)
   };
+}
+
+function esperaAlDocente(cita) {
+  return cita.citEstado === "PENDIENTE" &&
+    String(cita.citObservaciones || "").includes(PROPUESTA_ENCARGADO);
 }
 
 function limpiarMarcador(observaciones) {

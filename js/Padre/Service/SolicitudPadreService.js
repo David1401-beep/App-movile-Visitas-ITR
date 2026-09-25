@@ -11,6 +11,7 @@ const LIMITE_OBSERVACIONES = 300;
 
 async function solicitarApi(ruta, opciones = {}) {
   const configuracion = {
+    credentials: "include",
     ...opciones,
     headers: {
       Accept: "application/json",

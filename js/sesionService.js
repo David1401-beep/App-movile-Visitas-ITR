@@ -5,15 +5,13 @@ const hostApi = ["", "localhost", "127.0.0.1"].includes(window.location.hostname
 const AUTH_BASE_URL = `http://${hostApi}:8081/api/v1`;
 const API_BASE_URL = `http://${hostApi}:8080/api/v1`;
 
+// Datos del perfil para mostrar en pantalla. El token no esta aqui,
+// va en una cookie que maneja el navegador.
 const CLAVE_SESION_PADRE = "visitasITR.sesionPadre";
 const CLAVE_CORREO_ESTUDIANTE = "visitasITR.correoEstudiante";
-
 const CLAVE_ID_DOCENTE = "visitasITR.idDocente";
 const CLAVE_CORREO_DOCENTE = "visitasITR.correoDocente";
-
-const CLAVE_TOKEN = "visitasITR.token";
 const CLAVE_ROL = "visitasITR.rol";
-const CLAVE_EXPIRA = "visitasITR.expira";
 
 const ROLES_DOCENTE = [
   "DOCENTE",
@@ -35,6 +33,8 @@ async function pedirAuth(ruta, cuerpo) {
   try {
     respuesta = await fetch(`${AUTH_BASE_URL}${ruta}`, {
       method: "POST",
+      // Sin esto el navegador no guarda ni manda la cookie.
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json"
@@ -60,6 +60,7 @@ async function pedirAuth(ruta, cuerpo) {
 
 async function consultarApi(ruta) {
   const respuesta = await fetch(`${API_BASE_URL}${ruta}`, {
+    credentials: "include",
     headers: { Accept: "application/json" }
   });
 
@@ -75,11 +76,8 @@ async function consultarApi(ruta) {
 
 // Inicio de sesión unificado
 
-/**
- * Valida las credenciales y prepara la sesión según el rol en V_USUARIOS_AUTH.
- *
- * @returns {Promise<{tipo: string, destino: string}>} Adónde debe ir la app.
- */
+// Revisa el correo y la contraseña y arma la sesión según el rol.
+// Devuelve a qué pantalla hay que ir.
 export async function iniciarSesion(correo, password) {
   const email = String(correo || "").trim().toLowerCase();
 
@@ -94,7 +92,13 @@ export async function iniciarSesion(correo, password) {
   const credenciales = { email, password };
 
   // 1. Consulta la API Auth (Puerto 8081 - Busca en V_USUARIOS_AUTH)
-  const auth = await pedirAuth("/auth/login", credenciales);
+  let auth = await pedirAuth("/auth/login", credenciales);
+
+  // El /auth/login no acepta estudiantes y responde 403. En ese caso
+  // pruebo por la ruta del encargado.
+  if (auth.estado === 403) {
+    auth = await pedirAuth("/usuarios/inicio-sesion-encargado", credenciales);
+  }
 
   if (!auth.ok) {
     if (auth.estado === 401) {
@@ -107,6 +111,7 @@ export async function iniciarSesion(correo, password) {
 
   // 2. Bloqueo para Administradores/Recepcionistas (deben usar el portal web)
   if (ROLES_ADMINISTRATIVOS.includes(rol)) {
+    await limpiarSesion();
     throw new Error(
       "Esta cuenta pertenece al personal administrativo. " +
       "Ingrese desde el sitio web correspondiente."
@@ -130,26 +135,17 @@ export async function iniciarSesion(correo, password) {
 
 
 // Construcción de la sesión
-function guardarDatosComunes(datos) {
-  localStorage.setItem(CLAVE_TOKEN, datos.token);
-  localStorage.setItem(CLAVE_ROL, datos.rol);
-
-  const vence = Date.now() + (Number(datos.expiraEnSegundos) || 0) * 1000;
-  localStorage.setItem(CLAVE_EXPIRA, String(vence));
-}
-
 function guardarSesionDocente(datos, email) {
-  limpiarSesion();
-  guardarDatosComunes(datos);
+  limpiarDatosLocales();
 
+  localStorage.setItem(CLAVE_ROL, datos.rol);
   localStorage.setItem(CLAVE_ID_DOCENTE, datos.idUsuario);
   localStorage.setItem(CLAVE_CORREO_DOCENTE, datos.email || email);
 }
 
 async function guardarSesionPadre(datos, email) {
-  limpiarSesion();
-  // Se fuerza el rol activo a ENCARGADO para la sesión local
-  guardarDatosComunes({ ...datos, rol: "ENCARGADO" });
+  limpiarDatosLocales();
+  localStorage.setItem(CLAVE_ROL, "ENCARGADO");
 
   const idEstudiante = Number(datos.idUsuario);
   let estudiante = null;
@@ -188,54 +184,72 @@ async function guardarSesionPadre(datos, email) {
 
 
 // Estado de la sesión
-export function haySesionActiva() {
-  const token = localStorage.getItem(CLAVE_TOKEN);
-  const expira = Number(localStorage.getItem(CLAVE_EXPIRA));
 
-  if (!token) {
-    return false;
+// Le pregunto a la API si la sesión sigue activa. Siempre reviso aquí,
+// porque el localStorage lo puede cambiar cualquiera.
+export async function obtenerSesion() {
+  try {
+    const respuesta = await fetch(`${AUTH_BASE_URL}/auth/me`, {
+      credentials: "include",
+      headers: { Accept: "application/json" }
+    });
+
+    if (!respuesta.ok) {
+      return null;
+    }
+
+    const contenido = await respuesta.json().catch(() => null);
+    return contenido?.data ?? null;
+  } catch (error) {
+    return null;
   }
+}
 
-  if (expira && Date.now() > expira) {
-    limpiarSesion();
-    return false;
-  }
-
-  return true;
+export async function haySesionActiva() {
+  return (await obtenerSesion()) !== null;
 }
 
 export function obtenerRol() {
   return localStorage.getItem(CLAVE_ROL);
 }
 
-export function esDocente() {
-  return ROLES_DOCENTE.includes(String(obtenerRol() || "").toUpperCase());
+export function esDocente(rol = obtenerRol()) {
+  return ROLES_DOCENTE.includes(String(rol || "").toUpperCase());
 }
 
-/**
- * Pantalla que corresponde al rol de la sesión actual.
- */
-export function destinoSegunRol() {
-  return esDocente() ? "Docentes/index.html" : "Padres/index.html";
+// Pantalla que le toca según el rol.
+export function destinoSegunRol(rol = obtenerRol()) {
+  return esDocente(rol) ? "Docentes/index.html" : "Padres/index.html";
 }
 
-export function limpiarSesion() {
+// Cierra la sesión en el servidor y borra lo guardado en el navegador.
+export async function limpiarSesion() {
+  try {
+    await fetch(`${AUTH_BASE_URL}/auth/logout`, {
+      method: "POST",
+      credentials: "include"
+    });
+  } catch (error) {
+    console.error("No fue posible cerrar la sesión en el servidor.", error);
+  }
+
+  limpiarDatosLocales();
+}
+
+function limpiarDatosLocales() {
   [
     CLAVE_SESION_PADRE, CLAVE_CORREO_ESTUDIANTE,
-    CLAVE_ID_DOCENTE, CLAVE_CORREO_DOCENTE,
-    CLAVE_TOKEN, CLAVE_ROL, CLAVE_EXPIRA,
+    CLAVE_ID_DOCENTE, CLAVE_CORREO_DOCENTE, CLAVE_ROL,
+    // Claves viejas de cuando guardaba el token en el navegador.
+    "visitasITR.token", "visitasITR.expira",
     "visitasITR.tokenDocente", "visitasITR.rolDocente",
     "visitasITR.expiraDocente", "visitasITR.correoPadre"
   ].forEach(clave => localStorage.removeItem(clave));
 }
 
-/**
- * Envía al inicio de sesión a quien no tenga una sesión vigente.
- *
- * @param {string} nivel ruta relativa hasta la raíz del proyecto.
- */
-export function exigirSesion(nivel = "../") {
-  if (!haySesionActiva()) {
+// Si no hay sesión activa, manda al login.
+export async function exigirSesion(nivel = "../") {
+  if (!(await haySesionActiva())) {
     window.location.replace(`${nivel}inicioSesion.html`);
     return false;
   }

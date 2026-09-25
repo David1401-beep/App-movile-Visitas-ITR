@@ -1,3 +1,4 @@
+import { compararCitas } from "../../ordenCitas.js";
 import {
   solicitarApi,
   obtenerSesionPadre,
@@ -34,9 +35,7 @@ export async function obtenerAgendaPadre() {
     .filter(cita => idsRelacion.has(Number(cita.idEstudianteEncargado)))
     .map(convertirCita)
     // Las más próximas primero: es lo que el encargado necesita ver.
-    .sort((primera, segunda) =>
-      (primera.fechaReunion || "").localeCompare(segunda.fechaReunion || "")
-    );
+    .sort((primera, segunda) => compararCitas(primera, segunda, false));
 }
 
 
