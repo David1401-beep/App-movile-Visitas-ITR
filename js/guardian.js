@@ -3,7 +3,7 @@
 
 import { obtenerSesion, esDocente, limpiarSesion } from "./sesionService.js";
 
-const LOGIN = "../inicioSesion.html";
+const LOGIN = "../index.html";
 
 // Escondo la pantalla mientras reviso, para que no se alcance a ver.
 document.documentElement.style.visibility = "hidden";

@@ -250,7 +250,7 @@ function limpiarDatosLocales() {
 // Si no hay sesión activa, manda al login.
 export async function exigirSesion(nivel = "../") {
   if (!(await haySesionActiva())) {
-    window.location.replace(`${nivel}inicioSesion.html`);
+    window.location.replace(`${nivel}index.html`);
     return false;
   }
 

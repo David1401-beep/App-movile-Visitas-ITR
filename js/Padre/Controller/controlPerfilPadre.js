@@ -75,7 +75,7 @@ async function agregarResumenCitas() {
 btnCerrarSesion?.addEventListener("click", async function (evento) {
   evento.preventDefault();
   await limpiarSesion();
-  window.location.replace("../inicioSesion.html");
+  window.location.replace("../index.html");
 });
 
 function escribir(elemento, valor) {
