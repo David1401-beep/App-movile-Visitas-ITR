@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
         motivo
       });
 
-      window.location.href = `solicitudes.html?${redirectParams.toString()}`;
+      window.location.href = `solicitudes-padres.html?${redirectParams.toString()}`;
     } else {
       requestForm.reset();
       requestForm.classList.remove('was-validated');

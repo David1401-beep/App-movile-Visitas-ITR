@@ -3,7 +3,7 @@
 
 import { obtenerSesion, esDocente, limpiarSesion } from "./sesionService.js";
 
-const LOGIN = "../index.html";
+const LOGIN = "inicioSesion.html";
 
 // Escondo la pantalla mientras reviso, para que no se alcance a ver.
 document.documentElement.style.visibility = "hidden";
@@ -13,8 +13,11 @@ const sesion = await obtenerSesion();
 if (!sesion) {
     window.location.replace(LOGIN);
 } else {
-    const enDocentes = window.location.pathname.includes("/Docentes/");
-    const enPadres = window.location.pathname.includes("/Padres/");
+    // Ahora todas las pantallas estan en pages/, asi que el rol se sabe
+    // por el final del nombre del archivo y ya no por la carpeta.
+    const pagina = window.location.pathname.toLowerCase();
+    const enDocentes = pagina.endsWith("-docente.html");
+    const enPadres = pagina.endsWith("-padres.html");
     const docente = esDocente(sesion.rol);
 
     const rolCorrecto = enDocentes ? docente : enPadres ? !docente : true;

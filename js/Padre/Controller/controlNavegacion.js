@@ -10,13 +10,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (href) {
       const pageName = href.split('/').pop();
-      if (
-        currentPath.endsWith(pageName) ||
-        (pageName === 'index.html' && (currentPath.endsWith('/') || currentPath === ''))
-      ) {
+      if (currentPath.endsWith(pageName)) {
         navItems.forEach(i => i.classList.remove('active'));
         item.classList.add('active');
-      } else if (pageName === 'citas.html' && currentPath.endsWith('crearsolicitud.html')) {
+      } else if (pageName === 'citas-padres.html' && currentPath.endsWith('crearsolicitud-padres.html')) {
         navItems.forEach(i => i.classList.remove('active'));
         item.classList.add('active');
       }

@@ -2,7 +2,7 @@ import {
   iniciarSesion,
   obtenerSesion,
   destinoSegunRol
-} from "./js/sesionService.js";
+} from "./sesionService.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
   const formulario = document.getElementById("formulario-inicio-sesion");

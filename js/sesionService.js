@@ -121,13 +121,13 @@ export async function iniciarSesion(correo, password) {
   // 3. Flujo para Docentes
   if (ROLES_DOCENTE.includes(rol)) {
     guardarSesionDocente(auth.datos, email);
-    return { tipo: "docente", destino: "Docentes/index.html" };
+    return { tipo: "docente", destino: "inicio-docente.html" };
   }
 
   // 4. Flujo para Estudiantes / Encargados (ingresan con credenciales de estudiante)
   if (rol === "ESTUDIANTE" || rol === "ENCARGADO") {
     await guardarSesionPadre(auth.datos, email);
-    return { tipo: "encargado", destino: "Padres/index.html" };
+    return { tipo: "encargado", destino: "inicio-padres.html" };
   }
 
   throw new Error("El rol asociado a esta cuenta no tiene permisos de acceso.");
@@ -219,7 +219,7 @@ export function esDocente(rol = obtenerRol()) {
 
 // Pantalla que le toca según el rol.
 export function destinoSegunRol(rol = obtenerRol()) {
-  return esDocente(rol) ? "Docentes/index.html" : "Padres/index.html";
+  return esDocente(rol) ? "inicio-docente.html" : "inicio-padres.html";
 }
 
 // Cierra la sesión en el servidor y borra lo guardado en el navegador.
@@ -248,9 +248,9 @@ function limpiarDatosLocales() {
 }
 
 // Si no hay sesión activa, manda al login.
-export async function exigirSesion(nivel = "../") {
+export async function exigirSesion() {
   if (!(await haySesionActiva())) {
-    window.location.replace(`${nivel}index.html`);
+    window.location.replace("inicioSesion.html");
     return false;
   }
 

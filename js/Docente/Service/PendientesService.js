@@ -25,7 +25,7 @@ export async function obtenerPendientes() {
       titulo: "Revisar solicitudes de cita",
       icono: "bi-inbox-fill",
       color: "text-warning",
-      enlace: "verSolicitud.html",
+      enlace: "verSolicitud-docente.html",
       textoEnlace: "Revisar",
       items: solicitudes
     });
@@ -43,7 +43,7 @@ export async function obtenerPendientes() {
       titulo: "Convocatorias sin respuesta",
       icono: "bi-hourglass-split",
       color: "text-info",
-      enlace: "Agenda.html",
+      enlace: "agenda-docente.html",
       textoEnlace: "Ver",
       items: sinRespuesta
     });
@@ -61,7 +61,7 @@ export async function obtenerPendientes() {
       titulo: "Reuniones de hoy",
       icono: "bi-calendar-check-fill",
       color: "text-success",
-      enlace: "Agenda.html",
+      enlace: "agenda-docente.html",
       textoEnlace: "Ver",
       items: deHoy
     });
@@ -78,7 +78,7 @@ export async function obtenerPendientes() {
       titulo: "Citas sin cerrar",
       icono: "bi-exclamation-triangle-fill",
       color: "text-danger",
-      enlace: "Agenda.html",
+      enlace: "agenda-docente.html",
       textoEnlace: "Ver",
       items: vencidas
     });

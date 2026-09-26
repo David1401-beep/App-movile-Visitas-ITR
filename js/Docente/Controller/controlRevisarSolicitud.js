@@ -121,10 +121,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     acceptModalEl?.addEventListener('hidden.bs.modal', () => {
-        window.location.href = 'verSolicitud.html';
+        window.location.href = 'verSolicitud-docente.html';
     });
 
     rejectModalEl?.addEventListener('hidden.bs.modal', () => {
-        window.location.href = 'verSolicitud.html';
+        window.location.href = 'verSolicitud-docente.html';
     });
 });

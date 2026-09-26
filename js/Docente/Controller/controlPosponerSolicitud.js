@@ -187,6 +187,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Al cerrar la confirmación, se vuelve al listado de solicitudes.
   successModalEl?.addEventListener('hidden.bs.modal', () => {
-    window.location.href = 'verSolicitud.html';
+    window.location.href = 'verSolicitud-docente.html';
   });
 });

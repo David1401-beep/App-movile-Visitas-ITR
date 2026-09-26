@@ -41,7 +41,7 @@ function agregarDato(etiqueta, valor) {
 btnCerrarSesion?.addEventListener("click", async function (evento) {
   evento.preventDefault();
   await limpiarSesion();
-  window.location.replace("../index.html");
+  window.location.replace("inicioSesion.html");
 });
 
 function escribir(elemento, valor) {

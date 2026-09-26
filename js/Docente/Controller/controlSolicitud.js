@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   modalElement?.addEventListener('hidden.bs.modal', () => {
     if (esEdicion) {
-      window.location.href = 'Agenda.html';
+      window.location.href = 'agenda-docente.html';
       return;
     }
 

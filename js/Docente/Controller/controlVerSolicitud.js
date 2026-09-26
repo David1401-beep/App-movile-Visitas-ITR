@@ -88,11 +88,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           </p>
           <div class="request-summary-actions" id="acciones-solicitud-${request.idCita}">
             <a class="request-list-action request-list-review" id="btn-revisar-solicitud-${request.idCita}"
-              href="revisarSolicitud.html?${reviewParameters.toString()}">
+              href="revisarSolicitud-docente.html?${reviewParameters.toString()}">
               Revisar
             </a>
             <a class="request-list-action request-list-postpone" id="btn-posponer-solicitud-${request.idCita}"
-              href="posponerSolicitud.html?${postponeParameters.toString()}">
+              href="posponerSolicitud-docente.html?${postponeParameters.toString()}">
               Posponer
             </a>
           </div>

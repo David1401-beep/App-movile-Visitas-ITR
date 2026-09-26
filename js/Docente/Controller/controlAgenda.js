@@ -147,7 +147,7 @@ function construirEvento(cita, fechaTexto) {
   const acciones = cita.editable
     ? `
       <div class="d-flex gap-2 mt-2" id="acciones-evento-${cita.idCita}">
-        <a class="btn btn-solicitud btn-editar btn-sm fw-semibold" href="crearSolicitud.html?${enlaceEdicion(cita)}">
+        <a class="btn btn-solicitud btn-editar btn-sm fw-semibold" href="crearSolicitud-docente.html?${enlaceEdicion(cita)}">
           <i class="bi bi-pencil-fill" aria-hidden="true"></i> Editar
         </a>
         <button type="button" class="btn btn-solicitud btn-cancelar btn-sm fw-semibold btn-cancelar-cita"
