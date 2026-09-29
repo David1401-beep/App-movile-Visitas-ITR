@@ -1,9 +1,5 @@
+import { API_BASE_URL } from "../../config.js";
 import { compararCitas } from "../../ordenCitas.js";
-const hostApi = ["", "localhost", "127.0.0.1"].includes(window.location.hostname)
-  ? "localhost"
-  : window.location.hostname;
-
-const API_BASE_URL = `http://${hostApi}:8080/api/v1`;
 const CLAVE_DATOS_SESION = "visitasITR.sesionPadre";
 const MARCADOR_SOLICITUD_PADRE = "[SOLICITUD_PADRE]";
 const LIMITE_OBSERVACIONES = 300;

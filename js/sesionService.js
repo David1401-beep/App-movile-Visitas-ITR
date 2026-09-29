@@ -1,9 +1,6 @@
-const hostApi = ["", "localhost", "127.0.0.1"].includes(window.location.hostname)
-  ? "localhost"
-  : window.location.hostname;
-
-const AUTH_BASE_URL = `http://${hostApi}:8081/api/v1`;
-const API_BASE_URL = `http://${hostApi}:8080/api/v1`;
+import { API_BASE_URL } from "./config.js";
+// Ahora el login y los datos salen de la misma API, por eso un solo puerto.
+const AUTH_BASE_URL = API_BASE_URL;
 
 // Datos del perfil para mostrar en pantalla. El token no esta aqui,
 // va en una cookie que maneja el navegador.
@@ -44,7 +41,7 @@ async function pedirAuth(ruta, cuerpo) {
   } catch (error) {
     throw new Error(
       "No se pudo conectar con el servicio de autenticación. " +
-      "Compruebe que esté ejecutándose en el puerto 8081."
+      "Compruebe que esté ejecutándose en el puerto 8080."
     );
   }
 
@@ -91,7 +88,7 @@ export async function iniciarSesion(correo, password) {
 
   const credenciales = { email, password };
 
-  // 1. Consulta la API Auth (Puerto 8081 - Busca en V_USUARIOS_AUTH)
+  // 1. Consulta el login de la API (busca en V_USUARIOS_AUTH)
   let auth = await pedirAuth("/auth/login", credenciales);
 
   // El /auth/login no acepta estudiantes y responde 403. En ese caso
@@ -101,9 +98,8 @@ export async function iniciarSesion(correo, password) {
   }
 
   if (!auth.ok) {
-    if (auth.estado === 401) {
-      throw new Error("El correo o la contraseña son incorrectos.");
-    }
+    // Dejo pasar el mensaje de la API: distingue si el correo no esta
+    // registrado o si la contrasena esta mal.
     throw new Error(auth.mensaje || "Error al verificar las credenciales.");
   }
 

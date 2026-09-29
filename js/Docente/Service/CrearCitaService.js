@@ -1,8 +1,4 @@
-const hostApi = ["", "localhost", "127.0.0.1"].includes(window.location.hostname)
-  ? "localhost"
-  : window.location.hostname;
-
-const API_BASE_URL = `http://${hostApi}:8080/api/v1`;
+import { API_BASE_URL } from "../../config.js";
 const CLAVE_ID_DOCENTE = "visitasITR.idDocente";
 
 const LIMITE_MOTIVO = 250;

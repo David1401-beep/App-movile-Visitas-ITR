@@ -5,14 +5,22 @@ import { obtenerSesion, esDocente, limpiarSesion } from "./sesionService.js";
 
 const LOGIN = "inicioSesion.html";
 
-// Escondo la pantalla mientras reviso, para que no se alcance a ver.
-document.documentElement.style.visibility = "hidden";
+function esconder() {
+    document.documentElement.style.visibility = "hidden";
+}
 
-const sesion = await obtenerSesion();
+function mostrar() {
+    document.documentElement.style.visibility = "visible";
+}
 
-if (!sesion) {
-    window.location.replace(LOGIN);
-} else {
+async function revisarSesion() {
+    const sesion = await obtenerSesion();
+
+    if (!sesion) {
+        window.location.replace(LOGIN);
+        return;
+    }
+
     // Ahora todas las pantallas estan en pages/, asi que el rol se sabe
     // por el final del nombre del archivo y ya no por la carpeta.
     const pagina = window.location.pathname.toLowerCase();
@@ -25,7 +33,22 @@ if (!sesion) {
     if (!rolCorrecto) {
         await limpiarSesion();
         window.location.replace(LOGIN);
-    } else {
-        document.documentElement.style.visibility = "visible";
+        return;
     }
+
+    mostrar();
 }
+
+// Escondo la pantalla mientras reviso, para que no se alcance a ver.
+esconder();
+await revisarSesion();
+
+// Al darle a la flecha de atras el navegador devuelve la pantalla tal como
+// estaba, sin volver a ejecutar este script. Por eso vuelvo a preguntar
+// aqui: si ya cerro sesion, no alcanza a ver los datos viejos.
+window.addEventListener("pageshow", evento => {
+    if (evento.persisted) {
+        esconder();
+        revisarSesion();
+    }
+});
