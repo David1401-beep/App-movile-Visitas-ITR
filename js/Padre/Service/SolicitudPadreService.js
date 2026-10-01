@@ -75,28 +75,34 @@ async function obtenerRelacionesSesion(sesion) {
     .filter(relacion => sesion.idsEstudiante.includes(Number(relacion.idEstudiante)));
 }
 
-// El colegio atiende de 7:00 AM a 3:20 PM. En esta pantalla el padre solo
-// elige el dia, asi que la hora la pone el sistema y tiene que caer dentro
-// de esa franja.
-const MINUTO_APERTURA = 7 * 60;        // 07:00
-const MINUTO_CIERRE = 15 * 60 + 20;    // 15:20
+// En esta pantalla el padre solo elige el dia, asi que la hora la pone el
+// sistema y tiene que caer dentro del horario del colegio:
+//   lunes a viernes  8:00 a 16:00
+//   sabado           8:00 a 11:00
+const MINUTO_APERTURA = 8 * 60;              // 08:00
+const CIERRE_ENTRE_SEMANA = 16 * 60;         // 16:00
+const CIERRE_SABADO = 11 * 60;               // 11:00
 
 function construirFechaReunion(fecha) {
+  const [anio, mes, dia] = fecha.split("-").map(Number);
+  const esSabado = new Date(anio, mes - 1, dia).getDay() === 6;
+  const minutoCierre = esSabado ? CIERRE_SABADO : CIERRE_ENTRE_SEMANA;
+
   const ahora = new Date();
   const fechaActual = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, "0")}-${String(ahora.getDate()).padStart(2, "0")}`;
 
-  if (fecha !== fechaActual) {
-    return `${fecha}T08:00:00`;
-  }
+  let minutoDelDia = MINUTO_APERTURA;
 
-  // Para hoy se deja un margen de 5 minutos, pero sin salirse del horario.
-  ahora.setMinutes(ahora.getMinutes() + 5);
-  let minutoDelDia = ahora.getHours() * 60 + ahora.getMinutes();
+  if (fecha === fechaActual) {
+    // Para hoy se deja un margen de 5 minutos, pero sin salirse del horario.
+    ahora.setMinutes(ahora.getMinutes() + 5);
+    minutoDelDia = ahora.getHours() * 60 + ahora.getMinutes();
+  }
 
   if (minutoDelDia < MINUTO_APERTURA) {
     minutoDelDia = MINUTO_APERTURA;
-  } else if (minutoDelDia > MINUTO_CIERRE) {
-    minutoDelDia = MINUTO_CIERRE;
+  } else if (minutoDelDia > minutoCierre) {
+    minutoDelDia = minutoCierre;
   }
 
   const horas = String(Math.floor(minutoDelDia / 60)).padStart(2, "0");

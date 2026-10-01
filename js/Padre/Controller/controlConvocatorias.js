@@ -3,6 +3,7 @@ import {
   obtenerConvocatoriasPadre,
   posponerConvocatoria
 } from '../Service/ConvocatoriasService.js';
+import { ajustarCampoHora } from '../../horarioCitas.js';
 
 // Controla las convocatorias recibidas desde la API y las respuestas del encargado.
 document.addEventListener('DOMContentLoaded', async () => {
@@ -18,6 +19,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const resultTitle = document.getElementById('titulo-resultado-convocatoria');
   const resultMessage = document.getElementById('mensaje-resultado-convocatoria');
   const liveRegion = document.getElementById('anuncios-convocatorias');
+
+  // Ajusta el rango de la hora segun el dia que elija.
+  ajustarCampoHora(dateInput, timeInput);
 
   if (!list || !postponeModal || !resultModal || !postponeForm) {
     return;

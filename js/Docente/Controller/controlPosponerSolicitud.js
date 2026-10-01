@@ -1,4 +1,5 @@
 import { posponerSolicitud } from "../Service/SolicitudDocenteService.js";
+import { ajustarCampoHora } from '../../horarioCitas.js';
 
 // Crea un modal compatible: usa Bootstrap cuando está disponible y una alternativa local si el CDN falla.
 function createCompatibleModal(modalElement) {
@@ -61,6 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const successModal = successModalEl ? createCompatibleModal(successModalEl) : null;
 
   if (!form || !dateInput || !timeInput) return;
+
+  // Ajusta el rango de la hora segun el dia que elija.
+  ajustarCampoHora(dateInput, timeInput);
 
   const params = new URLSearchParams(window.location.search);
   const idCita = params.get('solicitud');

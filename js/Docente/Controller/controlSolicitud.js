@@ -3,6 +3,7 @@ import {
   editarCitaDocente,
   obtenerDatosFormularioCita
 } from '../Service/CrearCitaService.js';
+import { ajustarCampoHora } from '../../horarioCitas.js';
 
 // Crea un modal compatible: usa Bootstrap cuando está disponible y una alternativa local si el CDN falla.
 function createCompatibleModal(modalElement, options = {}) {
@@ -66,6 +67,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const modalTitle = document.getElementById('titulo-modal-exito');
   const modalMessage = document.getElementById('mensaje-modal-exito');
   if (!form || !dateInput || !timeInput) return;
+
+  // Ajusta el rango de la hora segun el dia que elija.
+  ajustarCampoHora(dateInput, timeInput);
 
   const params = new URLSearchParams(window.location.search);
   const esEdicion = params.get('mode') === 'edit';

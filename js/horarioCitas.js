@@ -1,0 +1,88 @@
+// Horario de atencion del colegio. La misma regla esta en la API; aqui
+// esta para avisarle al usuario antes de que envie el formulario.
+//
+//   lunes a viernes  8:00 a 16:00
+//   sabado           8:00 a 11:00
+//   domingo          cerrado
+
+const APERTURA = "08:00";
+const CIERRE_ENTRE_SEMANA = "16:00";
+const CIERRE_SABADO = "11:00";
+
+// Devuelve el horario de ese dia, o que esta cerrado.
+export function horarioDeLaFecha(fecha) {
+  if (!fecha) {
+    return { abierto: true, min: APERTURA, max: CIERRE_ENTRE_SEMANA };
+  }
+
+  // Se parte el texto en vez de usar new Date(fecha), porque esa forma
+  // interpreta la fecha en UTC y puede correrse un dia.
+  const [anio, mes, dia] = fecha.split("-").map(Number);
+  const diaSemana = new Date(anio, mes - 1, dia).getDay();
+
+  if (diaSemana === 0) {
+    return {
+      abierto: false,
+      mensaje: "Los domingos la institución está cerrada."
+    };
+  }
+
+  if (diaSemana === 6) {
+    return {
+      abierto: true,
+      min: APERTURA,
+      max: CIERRE_SABADO,
+      mensaje: "Los sábados se atiende de 8:00 AM a 11:00 AM."
+    };
+  }
+
+  return {
+    abierto: true,
+    min: APERTURA,
+    max: CIERRE_ENTRE_SEMANA,
+    mensaje: "El horario de atención es de 8:00 AM a 4:00 PM."
+  };
+}
+
+// Deja el campo de hora con el rango que corresponde al dia elegido.
+export function ajustarCampoHora(campoFecha, campoHora) {
+  if (!campoFecha || !campoHora) {
+    return;
+  }
+
+  const aplicar = () => {
+    const horario = horarioDeLaFecha(campoFecha.value);
+
+    if (!horario.abierto) {
+      campoFecha.setCustomValidity(horario.mensaje);
+      campoHora.removeAttribute("min");
+      campoHora.removeAttribute("max");
+      return;
+    }
+
+    campoFecha.setCustomValidity("");
+    campoHora.min = horario.min;
+    campoHora.max = horario.max;
+    campoHora.title = horario.mensaje;
+  };
+
+  campoFecha.addEventListener("change", aplicar);
+  campoFecha.addEventListener("input", aplicar);
+  aplicar();
+}
+
+// Revisa fecha y hora juntas. Devuelve null si todo esta bien, o el
+// mensaje de lo que esta mal.
+export function revisarFechaHora(fecha, hora) {
+  const horario = horarioDeLaFecha(fecha);
+
+  if (!horario.abierto) {
+    return horario.mensaje;
+  }
+
+  if (hora && (hora < horario.min || hora > horario.max)) {
+    return horario.mensaje;
+  }
+
+  return null;
+}

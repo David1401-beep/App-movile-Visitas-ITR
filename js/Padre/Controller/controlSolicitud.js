@@ -2,6 +2,7 @@ import {
   cargarOpcionesSolicitud,
   crearSolicitudPadre
 } from '../Service/SolicitudPadreService.js';
+import { horarioDeLaFecha } from '../../horarioCitas.js';
 
 // Controla la validación y el modal de confirmación del formulario de solicitudes.
 document.addEventListener('DOMContentLoaded', () => {
@@ -175,8 +176,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   const validateDate = () => {
     const today = getToday();
     dateInput.min = today;
-    dateInput.setCustomValidity(dateInput.value && dateInput.value < today
-      ? 'La fecha de la visita no puede ser anterior a hoy.' : '');
+
+    if (dateInput.value && dateInput.value < today) {
+      dateInput.setCustomValidity('La fecha de la visita no puede ser anterior a hoy.');
+      return;
+    }
+
+    // Aqui solo se elige el dia; la hora la asigna el sistema dentro del
+    // horario. Lo unico que hay que impedir es que caiga en domingo.
+    const horario = horarioDeLaFecha(dateInput.value);
+    dateInput.setCustomValidity(horario.abierto ? '' : horario.mensaje);
   };
 
   validateDate();
