@@ -810,6 +810,9 @@ body.notifications-page {
   font-size: 0.85rem;
   color: #000000 !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  /* El correo es una sola palabra larga: sin esto se sale de la caja. */
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .info-box strong {
