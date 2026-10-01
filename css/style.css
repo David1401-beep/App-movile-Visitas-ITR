@@ -946,6 +946,9 @@ body.notifications-page {
   font-weight: 800;
   color: #000000;
   margin-bottom: 2.2rem;
+  /* "Recuperar Contraseña" no cabe en una línea en el celular: sin esto
+     la segunda línea queda pegada a un lado. */
+  text-align: center;
 }
 
 .login-form {
