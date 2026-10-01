@@ -2,7 +2,7 @@ import {
   cargarOpcionesSolicitud,
   crearSolicitudPadre
 } from '../Service/SolicitudPadreService.js';
-import { horarioDeLaFecha } from '../../horarioCitas.js';
+import { horarioDeLaFecha, ajustarCampoHora } from '../../horarioCitas.js';
 
 // Controla la validación y el modal de confirmación del formulario de solicitudes.
 document.addEventListener('DOMContentLoaded', () => {
@@ -161,13 +161,17 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', async () => {
   const form = document.getElementById('formulario-solicitud');
   const dateInput = document.getElementById('fecha-visita');
+  const timeInput = document.getElementById('hora-visita');
   const modalElement = document.getElementById('modal-solicitud-exitosa');
   const guardianSelect = document.getElementById('encargado');
   const teacherSelect = document.getElementById('docente');
   const reasonTextarea = document.getElementById('motivo-visita');
   const submitButton = document.getElementById('btn-enviar-solicitud');
   const errorMessage = document.getElementById('mensaje-error-solicitud');
-  if (!form || !dateInput) return;
+  if (!form || !dateInput || !timeInput) return;
+
+  // Ajusta el rango de la hora segun el dia que elija.
+  ajustarCampoHora(dateInput, timeInput);
 
   const getToday = () => {
     const now = new Date();
@@ -182,8 +186,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // Aqui solo se elige el dia; la hora la asigna el sistema dentro del
-    // horario. Lo unico que hay que impedir es que caiga en domingo.
+    // Los domingos el colegio esta cerrado.
     const horario = horarioDeLaFecha(dateInput.value);
     dateInput.setCustomValidity(horario.abierto ? '' : horario.mensaje);
   };
@@ -237,6 +240,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         idEstudianteEncargado: guardianSelect.value,
         idEmpleado: teacherSelect.value,
         fecha: dateInput.value,
+        hora: timeInput.value,
         motivo: reasonTextarea.value
       });
 

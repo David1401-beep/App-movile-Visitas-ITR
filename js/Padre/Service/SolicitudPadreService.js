@@ -75,33 +75,27 @@ async function obtenerRelacionesSesion(sesion) {
     .filter(relacion => sesion.idsEstudiante.includes(Number(relacion.idEstudiante)));
 }
 
-// En esta pantalla el padre solo elige el dia, asi que la hora la pone el
-// sistema y tiene que caer dentro del horario del colegio:
+// Horario del colegio, por si la hora no viene del formulario:
 //   lunes a viernes  8:00 a 16:00
 //   sabado           8:00 a 11:00
 const MINUTO_APERTURA = 8 * 60;              // 08:00
 const CIERRE_ENTRE_SEMANA = 16 * 60;         // 16:00
 const CIERRE_SABADO = 11 * 60;               // 11:00
 
-function construirFechaReunion(fecha) {
+function construirFechaReunion(fecha, hora) {
+  // La hora la elige el encargado en el formulario. Si por alguna razon no
+  // viene, se usa la apertura para no mandar una fecha sin hora.
+  if (hora) {
+    return `${fecha}T${hora}:00`;
+  }
+
   const [anio, mes, dia] = fecha.split("-").map(Number);
   const esSabado = new Date(anio, mes - 1, dia).getDay() === 6;
   const minutoCierre = esSabado ? CIERRE_SABADO : CIERRE_ENTRE_SEMANA;
 
-  const ahora = new Date();
-  const fechaActual = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, "0")}-${String(ahora.getDate()).padStart(2, "0")}`;
-
   let minutoDelDia = MINUTO_APERTURA;
 
-  if (fecha === fechaActual) {
-    // Para hoy se deja un margen de 5 minutos, pero sin salirse del horario.
-    ahora.setMinutes(ahora.getMinutes() + 5);
-    minutoDelDia = ahora.getHours() * 60 + ahora.getMinutes();
-  }
-
-  if (minutoDelDia < MINUTO_APERTURA) {
-    minutoDelDia = MINUTO_APERTURA;
-  } else if (minutoDelDia > minutoCierre) {
+  if (minutoDelDia > minutoCierre) {
     minutoDelDia = minutoCierre;
   }
 
@@ -182,7 +176,7 @@ export async function crearSolicitudPadre(datosSolicitud) {
       citMotivo: motivoCompleto.slice(0, LIMITE_MOTIVO),
       citEstado: "PENDIENTE",
       citObservaciones: observaciones,
-      citFechaReunion: construirFechaReunion(datosSolicitud.fecha)
+      citFechaReunion: construirFechaReunion(datosSolicitud.fecha, datosSolicitud.hora)
     })
   });
 }
