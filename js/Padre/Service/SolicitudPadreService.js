@@ -75,6 +75,12 @@ async function obtenerRelacionesSesion(sesion) {
     .filter(relacion => sesion.idsEstudiante.includes(Number(relacion.idEstudiante)));
 }
 
+// El colegio atiende de 7:00 AM a 3:20 PM. En esta pantalla el padre solo
+// elige el dia, asi que la hora la pone el sistema y tiene que caer dentro
+// de esa franja.
+const MINUTO_APERTURA = 7 * 60;        // 07:00
+const MINUTO_CIERRE = 15 * 60 + 20;    // 15:20
+
 function construirFechaReunion(fecha) {
   const ahora = new Date();
   const fechaActual = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, "0")}-${String(ahora.getDate()).padStart(2, "0")}`;
@@ -83,9 +89,18 @@ function construirFechaReunion(fecha) {
     return `${fecha}T08:00:00`;
   }
 
+  // Para hoy se deja un margen de 5 minutos, pero sin salirse del horario.
   ahora.setMinutes(ahora.getMinutes() + 5);
-  const horas = String(ahora.getHours()).padStart(2, "0");
-  const minutos = String(ahora.getMinutes()).padStart(2, "0");
+  let minutoDelDia = ahora.getHours() * 60 + ahora.getMinutes();
+
+  if (minutoDelDia < MINUTO_APERTURA) {
+    minutoDelDia = MINUTO_APERTURA;
+  } else if (minutoDelDia > MINUTO_CIERRE) {
+    minutoDelDia = MINUTO_CIERRE;
+  }
+
+  const horas = String(Math.floor(minutoDelDia / 60)).padStart(2, "0");
+  const minutos = String(minutoDelDia % 60).padStart(2, "0");
 
   return `${fecha}T${horas}:${minutos}:00`;
 }
