@@ -218,8 +218,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     teacherSelect.disabled = false;
     submitButton.disabled = false;
   } catch (error) {
-    // Retirado por petición del usuario
-    // if (errorMessage) errorMessage.textContent = error.message;
+    // Si las listas no cargan hay que decir por que: antes la pantalla se
+    // quedaba en "Cargando..." sin explicar nada.
+    if (errorMessage) errorMessage.textContent = error.message;
   }
 
   form.addEventListener('submit', async (event) => {
