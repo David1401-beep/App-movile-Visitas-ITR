@@ -44,11 +44,28 @@ export function horarioDeLaFecha(fecha) {
   };
 }
 
-// Deja el campo de hora con el rango que corresponde al dia elegido.
+// Deja el campo de hora con el rango que corresponde al dia elegido y no
+// deja enviar una hora fuera de ese rango.
+//
+// El min/max del input sirve para el selector, pero el navegador no siempre
+// lo hace cumplir: por eso ademas se revisa la hora a mano y se marca el
+// campo como invalido, que si frena el envio del formulario.
 export function ajustarCampoHora(campoFecha, campoHora) {
   if (!campoFecha || !campoHora) {
     return;
   }
+
+  const revisarHora = () => {
+    const horario = horarioDeLaFecha(campoFecha.value);
+
+    if (!horario.abierto || !campoHora.value) {
+      campoHora.setCustomValidity("");
+      return;
+    }
+
+    const fuera = campoHora.value < horario.min || campoHora.value > horario.max;
+    campoHora.setCustomValidity(fuera ? horario.mensaje : "");
+  };
 
   const aplicar = () => {
     const horario = horarioDeLaFecha(campoFecha.value);
@@ -57,6 +74,7 @@ export function ajustarCampoHora(campoFecha, campoHora) {
       campoFecha.setCustomValidity(horario.mensaje);
       campoHora.removeAttribute("min");
       campoHora.removeAttribute("max");
+      revisarHora();
       return;
     }
 
@@ -64,10 +82,13 @@ export function ajustarCampoHora(campoFecha, campoHora) {
     campoHora.min = horario.min;
     campoHora.max = horario.max;
     campoHora.title = horario.mensaje;
+    revisarHora();
   };
 
   campoFecha.addEventListener("change", aplicar);
   campoFecha.addEventListener("input", aplicar);
+  campoHora.addEventListener("change", revisarHora);
+  campoHora.addEventListener("input", revisarHora);
   aplicar();
 }
 
