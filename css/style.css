@@ -183,6 +183,46 @@ body {
   border-radius: 16px !important;
   box-shadow: 0 8px 12px rgba(0, 0, 0, 0.12);
   color: #000000;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+/* El color de la tarjeta segun el estado, igual que en convocatorias: asi
+   se reconoce de un vistazo sin tener que leer la etiqueta. Sirve para las
+   solicitudes y para las citas. */
+.solicitud-card.es-aceptada,
+.appointments-card.es-aceptada {
+  border: 2px solid #68b83d !important;
+  background-color: #dce8d6;
+}
+
+.solicitud-card.es-pospuesta,
+.appointments-card.es-pospuesta {
+  border: 2px solid #6e9ed8 !important;
+  background-color: #d9e3ee;
+}
+
+.solicitud-card.es-pendiente,
+.appointments-card.es-pendiente {
+  border: 2px solid #e0a800 !important;
+  background-color: #fdf3d8;
+}
+
+.solicitud-card.es-rechazada,
+.appointments-card.es-rechazada {
+  border: 2px solid #d9534f !important;
+  background-color: #f6dedd;
+}
+
+.solicitud-card.es-cancelada,
+.appointments-card.es-cancelada {
+  border: 2px solid #8a8f98 !important;
+  background-color: #e6e7e9;
+}
+
+.solicitud-card.es-finalizada,
+.appointments-card.es-finalizada {
+  border: 2px solid #4a4f57 !important;
+  background-color: #dfe1e4;
 }
 
 .solicitud-card .card-body {
@@ -191,7 +231,10 @@ body {
 
 .solicitud-titulo {
   font-size: 1rem;
+  /* El motivo suele ocupar varias lineas: sin esto se ven encimadas. */
+  line-height: 1.4;
   margin-bottom: 12px;
+  overflow-wrap: anywhere;
 }
 
 .solicitud-dato {
@@ -683,6 +726,7 @@ body {
   border-radius: 8px;
   background-color: #d5d5d5;
   color: #000000;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
   box-shadow: 0 8px 4px rgba(0, 0, 0, 0.12);
 }
 

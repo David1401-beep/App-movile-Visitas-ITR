@@ -13,6 +13,9 @@ const LIMITE_OBSERVACIONES = 300;
 // contestar al docente.
 const PROPUESTA_ENCARGADO = "Encargado propone otra fecha:";
 
+// El mismo texto que pone el docente cuando propone otra fecha.
+const PROPUESTA_DOCENTE = "Docente propone otra fecha:";
+
 let solicitudesEnMemoria = [];
 
 const nombresEstado = {
@@ -234,9 +237,20 @@ function limpiarMarcador(observaciones) {
     return "";
   }
 
-  return observaciones.startsWith(MARCADOR_SOLICITUD_PADRE)
+  let texto = observaciones.startsWith(MARCADOR_SOLICITUD_PADRE)
     ? observaciones.slice(MARCADOR_SOLICITUD_PADRE.length).trim()
     : observaciones;
+
+  // Tambien quito el "fulano propone otra fecha:". Quien propuso ya se ve
+  // en la etiqueta de la tarjeta, no hace falta repetirlo en el motivo.
+  for (const prefijo of [PROPUESTA_ENCARGADO, PROPUESTA_DOCENTE]) {
+    if (texto.startsWith(prefijo)) {
+      texto = texto.slice(prefijo.length).trim();
+      break;
+    }
+  }
+
+  return texto;
 }
 
 export function formatearFecha(fecha) {

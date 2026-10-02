@@ -34,7 +34,7 @@ async function cargarAgenda() {
 
 function construirTarjeta(cita) {
   return `
-    <article class="appointments-card card border-0" id="cita-${cita.idCita}">
+    <article class="appointments-card card border-0 ${claseTarjeta(cita.estadoApi)}" id="cita-${cita.idCita}">
       <div class="card-body">
 
         <div class="d-flex justify-content-between align-items-start gap-2">
@@ -82,6 +82,20 @@ function claseEstado(estadoApi) {
   };
 
   return clases[estadoApi] || "bg-secondary";
+}
+
+// Pinta la tarjeta completa segun el estado, como en convocatorias.
+function claseTarjeta(estadoApi) {
+  const clases = {
+    PENDIENTE: "es-pendiente",
+    ACEPTADA: "es-aceptada",
+    POSPUESTA: "es-pospuesta",
+    RECHAZADA: "es-rechazada",
+    CANCELADA: "es-cancelada",
+    FINALIZADA: "es-finalizada"
+  };
+
+  return clases[estadoApi] || "";
 }
 
 function mostrarMensaje(texto, esError = false) {

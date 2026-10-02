@@ -99,12 +99,12 @@ function construirTarjeta(solicitud) {
   const acciones = construirAcciones(solicitud);
 
   return `
-    <article class="card solicitud-card w-100" id="solicitud-${solicitud.idCita}">
+    <article class="card solicitud-card w-100 ${claseTarjeta(solicitud.estadoApi)}" id="solicitud-${solicitud.idCita}">
       <div class="card-body">
 
-        <div class="d-flex justify-content-between align-items-start">
+        <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
           <h2 class="solicitud-titulo fw-bold mb-0">${escaparHtml(solicitud.asunto)}</h2>
-          <span class="badge ${claseEstado(solicitud.estadoApi)}">
+          <span class="badge flex-shrink-0 ${claseEstado(solicitud.estadoApi)}">
             ${escaparHtml(solicitud.estado)}
           </span>
         </div>
@@ -133,6 +133,20 @@ function construirTarjeta(solicitud) {
       </div>
     </article>
   `;
+}
+
+// Pinta la tarjeta completa segun el estado, como en convocatorias.
+function claseTarjeta(estadoApi) {
+  const clases = {
+    PENDIENTE: "es-pendiente",
+    ACEPTADA: "es-aceptada",
+    POSPUESTA: "es-pospuesta",
+    RECHAZADA: "es-rechazada",
+    CANCELADA: "es-cancelada",
+    FINALIZADA: "es-finalizada"
+  };
+
+  return clases[estadoApi] || "";
 }
 
 function claseEstado(estadoApi) {
