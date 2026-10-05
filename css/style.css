@@ -2711,3 +2711,41 @@ body.convocations-page {
   background-color: var(--color-accent-hover);
   color: var(--color-text);
 }
+
+/* La flecha de regreso va pegada al titulo de la pantalla. Van juntas en
+   un grupo para que el encabezado siga repartiendo titulo y logo a los
+   extremos, igual que antes. */
+.encabezado-con-volver {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.btn-volver {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: transparent;
+  color: inherit;
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.btn-volver:hover,
+.btn-volver:focus-visible {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+/* En los encabezados oscuros la flecha se aclara al tocarla. */
+.profile-header .btn-volver:hover,
+.profile-header .btn-volver:focus-visible {
+  background-color: rgba(0, 0, 0, 0.08);
+}
