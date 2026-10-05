@@ -138,7 +138,10 @@ document.addEventListener('DOMContentLoaded', () => {
       '<p class="text-center text-secondary mb-0">Cargando comunicados...</p>';
 
     try {
-      todosLosComunicados = await obtenerComunicados();
+      // Los retirados no se listan: ya no los ven los encargados y aqui
+      // solo ocupaban lugar. No se borran, quedan guardados con
+      // COM_ACTIVO = 'N' por si alguna vez hay que consultarlos.
+      todosLosComunicados = (await obtenerComunicados()).filter(c => c.activo);
       aplicarFiltro();
     } catch (error) {
       console.error('No fue posible cargar los comunicados.', error);
@@ -269,7 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const respuesta = await Swal.fire({
         icon: 'warning',
         title: '¿Retirar el comunicado?',
-        text: 'Los encargados dejarán de verlo, pero quedará registro de que se publicó.',
+        text: 'Los encargados dejarán de verlo y saldrá de esta lista, pero queda guardado.',
         showCancelButton: true,
         confirmButtonText: 'Sí, retirar',
         cancelButtonText: 'Cancelar',
