@@ -2690,3 +2690,24 @@ body.convocations-page {
 #contenido-comunicados-padre .comunicados-filtro {
   margin-bottom: 1rem;
 }
+
+/* El "Ver todos" del filtro va del mismo amarillo que los demas botones
+   de accion, para que las pantallas se vean de un solo juego. */
+.btn-ver-todos {
+  padding: 4px 16px;
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+  color: #000000;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 5px 3px rgba(0, 0, 0, 0.16);
+}
+
+.btn-ver-todos:hover,
+.btn-ver-todos:focus-visible {
+  border-color: var(--color-accent-hover);
+  background-color: var(--color-accent-hover);
+  color: var(--color-text);
+}
