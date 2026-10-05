@@ -4,11 +4,21 @@
 // Se incluye asi en el HTML:
 //   <script type="module" src="../js/botonVolver.js"></script>
 
-// En el inicio no va: de ahi ya no hay para donde retroceder.
-const PANTALLAS_DE_INICIO = ["inicio-docente.html", "inicio-padres.html"];
-
 function nombreDePantalla() {
   return window.location.pathname.split("/").pop().toLowerCase();
+}
+
+// La flecha solo hace falta donde no se llega por la barra de abajo. Si la
+// pantalla esta en su propia barra no la pongo, porque desde ahi ya se
+// navega con un toque. Lo leo de la barra en vez de tener una lista escrita
+// a mano, asi sigue funcionando si algun dia cambian los botones.
+function estaEnLaBarra() {
+  const enlaces = document.querySelectorAll(".bottom-nav a[href]");
+  const pantalla = nombreDePantalla();
+
+  return Array.from(enlaces).some(enlace =>
+    enlace.getAttribute("href").split("/").pop().toLowerCase() === pantalla
+  );
 }
 
 function inicioQueCorresponde() {
@@ -50,7 +60,7 @@ function crearBoton() {
 }
 
 function colocarBoton() {
-  if (PANTALLAS_DE_INICIO.includes(nombreDePantalla())) {
+  if (estaEnLaBarra()) {
     return;
   }
 
