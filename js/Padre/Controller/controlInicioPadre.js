@@ -41,19 +41,23 @@ async function cargarAvisos() {
       return;
     }
 
+    // Cada aviso va en su propia tarjeta: asi se separan solos y el
+    // mensaje en negrita resalta sobre la firma.
     avisos.forEach((aviso, indice) => {
-      const parrafo = document.createElement("p");
-      parrafo.className = indice === avisos.length - 1 ? "mb-0" : "";
-      parrafo.id = `aviso-${aviso.idComunicado}`;
-      parrafo.textContent = aviso.mensaje;
+      const tarjeta = document.createElement("article");
+      tarjeta.className = `aviso-tarjeta${indice === avisos.length - 1 ? " mb-0" : ""}`;
+      tarjeta.id = `aviso-${aviso.idComunicado}`;
+
+      const mensaje = document.createElement("p");
+      mensaje.className = "aviso-mensaje mb-1";
+      mensaje.textContent = aviso.mensaje;
 
       const firma = document.createElement("small");
-      firma.className = "d-block text-secondary";
+      firma.className = "aviso-firma d-block text-secondary";
       firma.textContent = `${aviso.docente} · ${aviso.fechaTexto}`;
 
-      parrafo.appendChild(document.createElement("br"));
-      parrafo.appendChild(firma);
-      cuerpoAvisos.appendChild(parrafo);
+      tarjeta.append(mensaje, firma);
+      cuerpoAvisos.appendChild(tarjeta);
     });
   } catch (error) {
     console.error("No fue posible cargar los avisos.", error);

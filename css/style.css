@@ -129,6 +129,29 @@ body {
   line-height: 1.35;
 }
 
+/* Cada aviso en su propia tarjeta dentro del recuadro gris. El fondo blanco
+   la despega del fondo y hace de separador sin necesidad de una raya. */
+.aviso-tarjeta {
+  background-color: #ffffff;
+  border-radius: 7px;
+  padding: 0.7rem 0.75rem;
+  margin-bottom: 0.7rem;
+  text-align: left;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+/* El mensaje es lo que importa, va en negrita. */
+.aviso-mensaje {
+  font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.aviso-firma {
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+
 .appointment-card {
   min-height: 226px;
 }
@@ -2628,3 +2651,34 @@ body.convocations-page {
   font-size: clamp(0.8125rem, 3.4vw, 0.9rem);
 }
 
+
+/* Filtro por fecha de la pantalla de comunicados del docente. */
+.comunicados-filtro {
+  margin-bottom: 0.9rem;
+}
+
+.comunicados-filtro .form-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Lleva a la pantalla con todos los comunicados. Se ve igual que el boton
+   de "Ver mis citas" para que los dos recuadros del inicio combinen. */
+.btn-mas-comunicados {
+  align-self: center;
+  margin: 0 auto 0.9rem;
+  padding: 4px 18px;
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+  color: #000000;
+  font-size: 0.95rem;
+  line-height: 1.2;
+  box-shadow: 0 7px 3px rgba(0, 0, 0, 0.18);
+}
+
+.btn-mas-comunicados:hover,
+.btn-mas-comunicados:focus-visible {
+  border-color: var(--color-accent-hover);
+  background-color: var(--color-accent-hover);
+  color: var(--color-text);
+}

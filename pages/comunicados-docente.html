@@ -35,6 +35,18 @@
                 </button>
             </form>
 
+            <!-- Filtra los comunicados ya publicados por el dia en que se enviaron -->
+            <div class="comunicados-filtro" id="contenedor-filtro-comunicados">
+                <label class="form-label mb-1" id="etiqueta-filtro-fecha"
+                    for="filtro-fecha-comunicados">Filtrar por fecha</label>
+                <div class="d-flex gap-2">
+                    <input class="form-control" type="date" id="filtro-fecha-comunicados"
+                        name="filter_date">
+                    <button class="btn btn-outline-secondary" type="button"
+                        id="btn-limpiar-filtro-comunicados">Ver todos</button>
+                </div>
+            </div>
+
             <section class="communications-list" id="lista-comunicados" aria-label="Comunicados enviados"
                 aria-live="polite"></section>
         </main>

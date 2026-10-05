@@ -30,18 +30,21 @@ async function solicitarApi(ruta) {
     : contenido;
 }
 
-// Trae los avisos del más nuevo al más viejo. El limite es cuántos quiero.
+// Trae los avisos del más nuevo al más viejo. El limite es cuántos quiero;
+// pasando null los trae todos, que es lo que usa la pantalla completa.
 // La API solo manda los activos, así que los que el docente retiró no llegan.
 export async function obtenerAvisos(limite = 3) {
   const comunicados = await solicitarApi("/comunicados");
+  const lista = Array.isArray(comunicados) ? comunicados : [];
 
-  return (Array.isArray(comunicados) ? comunicados : [])
-    .slice(0, limite)
+  return (limite ? lista.slice(0, limite) : lista)
     .map(comunicado => ({
       idComunicado: comunicado.idComunicado,
       mensaje: comunicado.comMensaje,
       docente: comunicado.nombreDocente || "Docente",
       fecha: comunicado.comFecha,
+      // El dia suelto, para comparar contra el campo de fecha del filtro.
+      dia: String(comunicado.comFecha ?? "").slice(0, 10),
       fechaTexto: formatearFecha(comunicado.comFecha)
     }));
 }

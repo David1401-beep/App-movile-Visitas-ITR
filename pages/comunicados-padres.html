@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Comunicados - Visitas ITR</title>
+    <link rel="shortcut icon" href="../img/logoRicaldone.png" type="image/x-icon">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <script type="module" src="../js/guardian.js"></script>
+</head>
+
+<body class="appointments-page" id="cuerpo-comunicados-padre">
+    <div class="app-container" id="contenedor-aplicacion">
+        <header class="home-header d-flex align-items-center justify-content-between" id="encabezado-principal">
+            <h1 class="h6 fw-bold mb-0" id="titulo-encabezado">Comunicados</h1>
+            <img class="school-logo" id="imagen-logo" src="../img/logoRicaldone.png"
+                alt="Logo del Instituto Técnico Ricaldone">
+        </header>
+
+        <main class="appointments-content container-fluid d-flex flex-column align-items-center"
+            id="contenido-comunicados-padre">
+
+            <!-- Filtra por el dia en que el docente publico el comunicado -->
+            <div class="comunicados-filtro w-100" id="contenedor-filtro-avisos">
+                <label class="form-label mb-1" id="etiqueta-filtro-avisos"
+                    for="filtro-fecha-avisos">Filtrar por fecha</label>
+                <div class="d-flex gap-2">
+                    <input class="form-control" type="date" id="filtro-fecha-avisos" name="filter_date">
+                    <button class="btn btn-outline-secondary" type="button"
+                        id="btn-limpiar-filtro-avisos">Ver todos</button>
+                </div>
+            </div>
+
+            <section class="w-100" id="lista-avisos-padre" aria-label="Comunicados recibidos" aria-live="polite">
+                <p class="text-center text-secondary mb-0">Cargando comunicados...</p>
+            </section>
+        </main>
+
+        <footer id="pie-pagina">
+            <nav id="navegacion-principal" aria-label="Navegación principal">
+                <ul class="bottom-nav" id="lista-navegacion-inferior">
+                    <li class="nav-item" id="item-nav-inicio">
+                        <a id="enlace-nav-inicio" href="inicio-padres.html" aria-label="Inicio">
+                            <i class="bi bi-house-door-fill nav-icon" id="icono-nav-inicio" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="item-nav-citas">
+                        <a id="enlace-nav-citas" href="citas-padres.html" aria-label="Citas">
+                            <i class="bi bi-calendar3 nav-icon" id="icono-nav-citas" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="item-nav-convocatorias">
+                        <a id="enlace-nav-convocatorias" href="convocatorias-padres.html" aria-label="Convocatorias">
+                            <i class="bi bi-bookmark-star-fill nav-icon" id="icono-nav-convocatorias"
+                                aria-hidden="true"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item" id="item-nav-perfil">
+                        <a id="enlace-nav-perfil" href="perfil-padres.html" aria-label="Usuario">
+                            <i class="bi bi-person-circle nav-icon" id="icono-nav-perfil" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </footer>
+    </div>
+
+    <script id="script-control-navegacion" src="../js/Padre/Controller/controlNavegacion.js"></script>
+    <script type="module" id="script-control-comunicados"
+        src="../js/Padre/Controller/controlComunicadosPadre.js"></script>
+</body>
+
+</html>

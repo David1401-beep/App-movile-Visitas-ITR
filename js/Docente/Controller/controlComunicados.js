@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const messageInput = document.getElementById('mensaje-comunicado');
   const communicationsList = document.getElementById('lista-comunicados');
   const submitButton = document.getElementById('btn-enviar-comunicado');
+  const filtroFecha = document.getElementById('filtro-fecha-comunicados');
+  const btnLimpiarFiltro = document.getElementById('btn-limpiar-filtro-comunicados');
 
   if (!form || !messageInput || !communicationsList) {
     return;
@@ -103,18 +105,55 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
+  // Me guardo la lista completa para que el filtro trabaje sobre ella sin
+  // volver a consultar la API cada vez que cambian la fecha.
+  let todosLosComunicados = [];
+
+  // fechaPublicacion viene como "2026-10-04T15:30:00": me quedo con los
+  // primeros diez caracteres, que es lo mismo que da el campo de fecha.
+  const diaDelComunicado = (comunicado) =>
+    String(comunicado.fechaPublicacion ?? '').slice(0, 10);
+
+  const aplicarFiltro = () => {
+    const dia = filtroFecha?.value || '';
+
+    if (!dia) {
+      renderCommunications(todosLosComunicados);
+      return;
+    }
+
+    const filtrados = todosLosComunicados.filter(c => diaDelComunicado(c) === dia);
+
+    if (filtrados.length === 0) {
+      communicationsList.innerHTML =
+        '<p class="text-center text-secondary mb-0">No hay comunicados de esa fecha.</p>';
+      return;
+    }
+
+    renderCommunications(filtrados);
+  };
+
   const cargarComunicados = async () => {
     communicationsList.innerHTML =
       '<p class="text-center text-secondary mb-0">Cargando comunicados...</p>';
 
     try {
-      renderCommunications(await obtenerComunicados());
+      todosLosComunicados = await obtenerComunicados();
+      aplicarFiltro();
     } catch (error) {
       console.error('No fue posible cargar los comunicados.', error);
       communicationsList.innerHTML =
         `<p class="text-center text-danger mb-0">${escaparHtml(error.message)}</p>`;
     }
   };
+
+  filtroFecha?.addEventListener('change', aplicarFiltro);
+  filtroFecha?.addEventListener('input', aplicarFiltro);
+
+  btnLimpiarFiltro?.addEventListener('click', () => {
+    if (filtroFecha) filtroFecha.value = '';
+    aplicarFiltro();
+  });
 
   messageInput.addEventListener('input', () => {
     messageInput.setCustomValidity('');
