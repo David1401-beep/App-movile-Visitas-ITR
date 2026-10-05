@@ -2,17 +2,18 @@
 // esta para avisarle al usuario antes de que envie el formulario.
 //
 //   lunes a viernes  8:00 a 16:00
-//   sabado           8:00 a 11:00
+//   sabado           cerrado
 //   domingo          cerrado
 
 const APERTURA = "08:00";
-const CIERRE_ENTRE_SEMANA = "16:00";
-const CIERRE_SABADO = "11:00";
+const CIERRE = "16:00";
+
+const CERRADO_FIN_DE_SEMANA = "Los fines de semana no se atienden reuniones.";
 
 // Devuelve el horario de ese dia, o que esta cerrado.
 export function horarioDeLaFecha(fecha) {
   if (!fecha) {
-    return { abierto: true, min: APERTURA, max: CIERRE_ENTRE_SEMANA };
+    return { abierto: true, min: APERTURA, max: CIERRE };
   }
 
   // Se parte el texto en vez de usar new Date(fecha), porque esa forma
@@ -20,26 +21,17 @@ export function horarioDeLaFecha(fecha) {
   const [anio, mes, dia] = fecha.split("-").map(Number);
   const diaSemana = new Date(anio, mes - 1, dia).getDay();
 
-  if (diaSemana === 0) {
+  if (diaSemana === 0 || diaSemana === 6) {
     return {
       abierto: false,
-      mensaje: "Los domingos la institución está cerrada."
-    };
-  }
-
-  if (diaSemana === 6) {
-    return {
-      abierto: true,
-      min: APERTURA,
-      max: CIERRE_SABADO,
-      mensaje: "Los sábados se atiende de 8:00 AM a 11:00 AM."
+      mensaje: CERRADO_FIN_DE_SEMANA
     };
   }
 
   return {
     abierto: true,
     min: APERTURA,
-    max: CIERRE_ENTRE_SEMANA,
+    max: CIERRE,
     mensaje: "El horario de atención es de 8:00 AM a 4:00 PM."
   };
 }

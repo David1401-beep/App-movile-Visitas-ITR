@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../../config.js";
+import { horarioDeLaFecha } from "../../horarioCitas.js";
 const CLAVE_DATOS_SESION = "visitasITR.sesionPadre";
 const MARCADOR_SOLICITUD_PADRE = "[SOLICITUD_PADRE]";
 
@@ -75,34 +76,13 @@ async function obtenerRelacionesSesion(sesion) {
     .filter(relacion => sesion.idsEstudiante.includes(Number(relacion.idEstudiante)));
 }
 
-// Horario del colegio, por si la hora no viene del formulario:
-//   lunes a viernes  8:00 a 16:00
-//   sabado           8:00 a 11:00
-const MINUTO_APERTURA = 8 * 60;              // 08:00
-const CIERRE_ENTRE_SEMANA = 16 * 60;         // 16:00
-const CIERRE_SABADO = 11 * 60;               // 11:00
-
 function construirFechaReunion(fecha, hora) {
-  // La hora la elige el encargado en el formulario. Si por alguna razon no
-  // viene, se usa la apertura para no mandar una fecha sin hora.
-  if (hora) {
-    return `${fecha}T${hora}:00`;
-  }
+  // La hora la elige el encargado y es obligatoria. Si por alguna razon no
+  // viene, se usa la apertura para no mandar una fecha sin hora. El horario
+  // lo decide horarioCitas.js: aqui no se vuelve a escribir.
+  const horario = horarioDeLaFecha(fecha);
 
-  const [anio, mes, dia] = fecha.split("-").map(Number);
-  const esSabado = new Date(anio, mes - 1, dia).getDay() === 6;
-  const minutoCierre = esSabado ? CIERRE_SABADO : CIERRE_ENTRE_SEMANA;
-
-  let minutoDelDia = MINUTO_APERTURA;
-
-  if (minutoDelDia > minutoCierre) {
-    minutoDelDia = minutoCierre;
-  }
-
-  const horas = String(Math.floor(minutoDelDia / 60)).padStart(2, "0");
-  const minutos = String(minutoDelDia % 60).padStart(2, "0");
-
-  return `${fecha}T${horas}:${minutos}:00`;
+  return `${fecha}T${hora || horario.min || "08:00"}:00`;
 }
 
 export async function cargarOpcionesSolicitud() {
