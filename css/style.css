@@ -2749,3 +2749,156 @@ body.convocations-page {
 .profile-header .btn-volver:focus-visible {
   background-color: rgba(0, 0, 0, 0.08);
 }
+
+/* ---------------------------------------------------------------
+   Pantalla de comunicados del encargado
+   --------------------------------------------------------------- */
+
+/* Cuantos hay, y el boton que despliega la busqueda por fecha exacta. */
+.avisos-barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.7rem;
+}
+
+.avisos-conteo {
+  font-size: 0.88rem;
+  color: #6b7280;
+}
+
+.btn-calendario {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid #e3e5e9;
+  border-radius: 10px;
+  background-color: #ffffff;
+  color: var(--color-panel-dark);
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+.btn-calendario:hover,
+.btn-calendario:focus-visible,
+.btn-calendario.activo {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+  color: #000000;
+}
+
+/* Atajos de periodo. Se desplazan de lado si no caben. */
+.avisos-pastillas {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding-bottom: 0.2rem;
+  margin-bottom: 0.9rem;
+  scrollbar-width: none;
+}
+
+.avisos-pastillas::-webkit-scrollbar { display: none; }
+
+.pastilla {
+  flex: 0 0 auto;
+  border: 1px solid #e3e5e9;
+  border-radius: 999px;
+  background-color: #ffffff;
+  color: #4b5563;
+  font-size: 0.84rem;
+  font-weight: 600;
+  padding: 0.3rem 0.95rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pastilla:hover,
+.pastilla:focus-visible { border-color: #c9ccd2; }
+
+.pastilla.activa {
+  border-color: var(--color-panel-dark);
+  background-color: var(--color-panel-dark);
+  color: #ffffff;
+}
+
+.avisos-fecha { margin-bottom: 0.9rem; }
+
+/* La tarjeta: icono a la izquierda, mensaje al centro, fecha abajo a la
+   derecha. La base (.aviso-tarjeta) la comparte la pantalla de inicio. */
+.aviso-fila {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.aviso-icono {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background-color: #fff4cf;
+  color: #8a6a00;
+  font-size: 0.95rem;
+}
+
+.aviso-pie {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-top: 0.7rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid #eef0f2;
+}
+
+.aviso-autor {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.aviso-docente {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+  overflow-wrap: anywhere;
+}
+
+.aviso-hora {
+  font-size: 0.76rem;
+  color: #8b9096;
+}
+
+.aviso-marca {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.aviso-nuevo {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #000000;
+  background-color: var(--color-accent);
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+}
+
+.aviso-fecha {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #6b7280;
+  white-space: nowrap;
+}

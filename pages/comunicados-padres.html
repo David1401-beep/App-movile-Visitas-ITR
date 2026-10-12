@@ -27,10 +27,28 @@
         <main class="appointments-content container-fluid d-flex flex-column align-items-center"
             id="contenido-comunicados-padre">
 
-            <!-- Filtra por el dia en que el docente publico el comunicado -->
-            <div class="comunicados-filtro w-100" id="contenedor-filtro-avisos">
+            <!-- Cuantos hay y el acceso a la fecha exacta -->
+            <div class="avisos-barra w-100" id="barra-avisos">
+                <p class="avisos-conteo mb-0" id="conteo-avisos"></p>
+                <button class="btn-calendario" type="button" id="btn-abrir-fecha"
+                    aria-label="Buscar por una fecha exacta" aria-expanded="false">
+                    <i class="bi bi-calendar3" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <!-- Atajos de tiempo: evitan tener que escribir una fecha -->
+            <div class="avisos-pastillas w-100" id="pastillas-avisos" role="group"
+                aria-label="Filtrar comunicados por periodo">
+                <button class="pastilla activa" type="button" data-periodo="todos">Todos</button>
+                <button class="pastilla" type="button" data-periodo="hoy">Hoy</button>
+                <button class="pastilla" type="button" data-periodo="semana">Semana</button>
+                <button class="pastilla" type="button" data-periodo="mes">Mes</button>
+            </div>
+
+            <!-- Solo aparece al tocar el calendario -->
+            <div class="avisos-fecha w-100 d-none" id="contenedor-filtro-avisos">
                 <label class="form-label mb-1" id="etiqueta-filtro-avisos"
-                    for="filtro-fecha-avisos">Filtrar por fecha</label>
+                    for="filtro-fecha-avisos">Buscar una fecha exacta</label>
                 <div class="d-flex gap-2">
                     <input class="form-control" type="date" id="filtro-fecha-avisos" name="filter_date">
                     <button class="btn btn-ver-todos rounded-pill" type="button"
