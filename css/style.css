@@ -2687,10 +2687,6 @@ body.convocations-page {
   color: var(--color-text);
 }
 
-#contenido-comunicados-padre .comunicados-filtro {
-  margin-bottom: 1rem;
-}
-
 /* El "Ver todos" del filtro va del mismo amarillo que los demas botones
    de accion, para que las pantallas se vean de un solo juego. */
 .btn-ver-todos {
@@ -2901,4 +2897,21 @@ body.convocations-page {
   font-weight: 600;
   color: #6b7280;
   white-space: nowrap;
+}
+
+/* Al declarar overflow-x, la altura minima automatica de estos bloques pasa
+   a cero y el navegador los aplasta cuando la lista crece y falta espacio.
+   Con flex 0 0 auto conservan su alto siempre. */
+.avisos-barra,
+.avisos-pastillas,
+.avisos-fecha {
+  flex: 0 0 auto;
+}
+
+/* Esta pantalla es una lista seguida: el gap de 48px que usan las otras
+   pantallas de padres aqui deja huecos enormes entre el conteo, las
+   pastillas y las tarjetas. */
+#contenido-comunicados-padre {
+  gap: 0;
+  padding-top: 16px;
 }
