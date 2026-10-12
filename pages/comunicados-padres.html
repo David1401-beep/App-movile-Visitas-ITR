@@ -27,22 +27,24 @@
         <main class="appointments-content container-fluid d-flex flex-column align-items-center"
             id="contenido-comunicados-padre">
 
-            <!-- Cuantos hay y el acceso a la fecha exacta -->
-            <div class="avisos-barra w-100" id="barra-avisos">
-                <p class="avisos-conteo mb-0" id="conteo-avisos"></p>
+            <p class="avisos-conteo w-100" id="conteo-avisos"></p>
+
+            <!-- Atajos de tiempo mas el acceso a la fecha exacta. El calendario
+                 va fuera de la zona que se desliza para que no se pierda de
+                 vista cuando las pastillas no caben. -->
+            <div class="avisos-filtros w-100" id="barra-avisos">
+                <div class="avisos-pastillas" id="pastillas-avisos" role="group"
+                    aria-label="Filtrar comunicados por periodo">
+                    <button class="pastilla activa" type="button" data-periodo="todos">Todos</button>
+                    <button class="pastilla" type="button" data-periodo="hoy">Hoy</button>
+                    <button class="pastilla" type="button" data-periodo="semana">Semana</button>
+                    <button class="pastilla" type="button" data-periodo="mes">Mes</button>
+                </div>
+
                 <button class="btn-calendario" type="button" id="btn-abrir-fecha"
                     aria-label="Buscar por una fecha exacta" aria-expanded="false">
                     <i class="bi bi-calendar3" aria-hidden="true"></i>
                 </button>
-            </div>
-
-            <!-- Atajos de tiempo: evitan tener que escribir una fecha -->
-            <div class="avisos-pastillas w-100" id="pastillas-avisos" role="group"
-                aria-label="Filtrar comunicados por periodo">
-                <button class="pastilla activa" type="button" data-periodo="todos">Todos</button>
-                <button class="pastilla" type="button" data-periodo="hoy">Hoy</button>
-                <button class="pastilla" type="button" data-periodo="semana">Semana</button>
-                <button class="pastilla" type="button" data-periodo="mes">Mes</button>
             </div>
 
             <!-- Solo aparece al tocar el calendario -->
