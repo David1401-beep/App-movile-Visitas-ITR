@@ -1,5 +1,6 @@
 import { posponerSolicitud } from "../Service/SolicitudDocenteService.js";
 import { ajustarCampoHora } from '../../horarioCitas.js';
+import { revisar, avisoValidacion } from '../../validaciones.js';
 
 // Crea un modal compatible: usa Bootstrap cuando está disponible y una alternativa local si el CDN falla.
 function createCompatibleModal(modalElement) {
@@ -170,6 +171,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!form.checkValidity()) {
       form.reportValidity();
+      return;
+    }
+
+    const problema = revisar([
+      { el: reasonInput, nombre: "motivo", tipo: "texto", min: 5, max: 280 }
+    ]);
+
+    if (problema) {
+      avisoValidacion(problema);
       return;
     }
 

@@ -4,6 +4,7 @@ import {
   actualizarComunicado,
   retirarComunicado
 } from '../Service/ComunicadosService.js';
+import { revisar, revisarValor, avisoValidacion } from '../../validaciones.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('formulario-comunicados');
@@ -169,15 +170,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const message = messageInput.value.trim();
 
-    if (!message) {
-      messageInput.setCustomValidity('Escribe un comunicado antes de enviarlo.');
-      messageInput.reportValidity();
-      return;
-    }
-
     // COM_MENSAJE es VARCHAR2(500) en la base de datos.
-    if (message.length > 500) {
-      avisoError('El comunicado no puede exceder 500 caracteres.');
+    const problema = revisar([
+      { el: messageInput, nombre: "comunicado", tipo: "texto", min: 3, max: 500 }
+    ]);
+
+    if (problema) {
+      avisoValidacion(problema);
       return;
     }
 
@@ -243,9 +242,12 @@ document.addEventListener('DOMContentLoaded', () => {
       confirmButtonText: 'Guardar',
       cancelButtonText: 'Cancelar',
       reverseButtons: true,
+      // Las mismas reglas que al publicarlo.
       preConfirm: (valor) => {
-        if (!valor || !valor.trim()) {
-          Swal.showValidationMessage('El comunicado no puede quedar vacío.');
+        const problema = revisarValor(valor, { nombre: "comunicado", tipo: "texto", min: 3, max: 500 });
+
+        if (problema) {
+          Swal.showValidationMessage(problema);
           return false;
         }
         return valor.trim();

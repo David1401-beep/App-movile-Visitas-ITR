@@ -4,6 +4,7 @@ import {
   posponerConvocatoria
 } from '../Service/ConvocatoriasService.js';
 import { ajustarCampoHora } from '../../horarioCitas.js';
+import { revisar, avisoValidacion } from '../../validaciones.js';
 
 // Controla las convocatorias recibidas desde la API y las respuestas del encargado.
 document.addEventListener('DOMContentLoaded', async () => {
@@ -325,6 +326,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!postponeForm.checkValidity()) {
       postponeForm.reportValidity();
+      return;
+    }
+
+    const problema = revisar([
+      { el: reasonInput, nombre: "motivo", tipo: "texto", min: 5, max: 280 }
+    ]);
+
+    if (problema) {
+      avisoValidacion(problema);
       return;
     }
 

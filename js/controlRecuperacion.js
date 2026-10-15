@@ -1,4 +1,5 @@
 import { solicitarCodigo, verificarCodigo, cambiarPassword } from "./RecuperacionService.js";
+import { revisar, avisoValidacion, bloquearLetras } from "./validaciones.js";
 
 // Esta pantalla NO carga guardian.js a proposito: quien llega aqui no
 // tiene sesion, y el guardian lo sacaria antes de poder escribir nada.
@@ -12,6 +13,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const inputCodigo = document.getElementById("codigo-recuperar");
   const inputPassword = document.getElementById("password-nueva");
   const inputRepetida = document.getElementById("password-repetida");
+
+  // El codigo es de 6 digitos: no deja escribir letras.
+  bloquearLetras(inputCodigo);
 
   const btnEnviar = document.getElementById("btn-enviar-codigo");
   const btnVerificar = document.getElementById("btn-verificar-codigo");
@@ -28,6 +32,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!formCorreo.checkValidity()) {
       formCorreo.reportValidity();
+      return;
+    }
+
+    const problemaCorreo = revisar([
+      { el: inputCorreo, nombre: "correo", tipo: "correo" }
+    ]);
+
+    if (problemaCorreo) {
+      avisoValidacion(problemaCorreo);
       return;
     }
 
@@ -53,8 +66,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     codigo = inputCodigo.value.trim();
 
-    if (!/^[0-9]{6}$/.test(codigo)) {
-      mostrarError("El código son 6 dígitos.");
+    const problemaCodigo = revisar([
+      { el: inputCodigo, nombre: "código", tipo: "codigo" }
+    ]);
+
+    if (problemaCodigo) {
+      avisoValidacion(problemaCodigo);
       return;
     }
 
@@ -75,13 +92,17 @@ document.addEventListener("DOMContentLoaded", function () {
   formPassword.addEventListener("submit", async function (evento) {
     evento.preventDefault();
 
-    if (inputPassword.value.length < 6) {
-      mostrarError("La contraseña debe tener al menos 6 caracteres.");
+    const problemaPassword = revisar([
+      { el: inputPassword, nombre: "contraseña nueva", min: 6 }
+    ]);
+
+    if (problemaPassword) {
+      avisoValidacion(problemaPassword);
       return;
     }
 
     if (inputPassword.value !== inputRepetida.value) {
-      mostrarError("Las contraseñas no coinciden.");
+      avisoValidacion({ mensaje: "Las contraseñas no coinciden.", el: inputRepetida });
       return;
     }
 

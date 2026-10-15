@@ -1,4 +1,5 @@
 import { aceptarSolicitud, rechazarSolicitud } from "../Service/SolicitudDocenteService.js";
+import { revisar, avisoValidacion } from "../../validaciones.js";
 
 // Crea un modal compatible: usa Bootstrap cuando está disponible y una alternativa local si el CDN falla.
 function createCompatibleModal(modalElement) {
@@ -108,6 +109,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     btnRechazar?.addEventListener('click', async () => {
+        // El comentario es opcional; si lo escriben, que tenga sentido.
+        const problema = revisar([
+            { el: comentarios, nombre: "comentario", tipo: "texto", max: 300, opcional: true }
+        ]);
+
+        if (problema) {
+            avisoValidacion(problema);
+            return;
+        }
+
         btnRechazar.disabled = true;
 
         try {

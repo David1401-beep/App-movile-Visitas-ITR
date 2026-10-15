@@ -3,6 +3,7 @@ import {
   obtenerSesion,
   destinoSegunRol
 } from "./sesionService.js";
+import { revisar, avisoValidacion } from "./validaciones.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
   const formulario = document.getElementById("formulario-inicio-sesion");
@@ -29,6 +30,16 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     if (!formulario.checkValidity()) {
       formulario.reportValidity();
+      return;
+    }
+
+    const problema = revisar([
+      { el: inputCorreo, nombre: "correo", tipo: "correo" },
+      { el: inputPassword, nombre: "contraseña" }
+    ]);
+
+    if (problema) {
+      avisoValidacion(problema);
       return;
     }
 

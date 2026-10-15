@@ -3,6 +3,7 @@ import {
   crearSolicitudPadre
 } from '../Service/SolicitudPadreService.js';
 import { horarioDeLaFecha, ajustarCampoHora } from '../../horarioCitas.js';
+import { revisar, avisoValidacion } from '../../validaciones.js';
 
 // Controla la validación y el modal de confirmación del formulario de solicitudes.
 document.addEventListener('DOMContentLoaded', () => {
@@ -229,6 +230,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     form.classList.add('was-validated');
     if (!form.checkValidity()) {
       form.reportValidity();
+      return;
+    }
+
+    const problema = revisar([
+      { el: reasonTextarea, nombre: "motivo de la visita", tipo: "texto", min: 5, max: 280 }
+    ]);
+
+    if (problema) {
+      avisoValidacion(problema);
       return;
     }
 

@@ -4,6 +4,7 @@ import {
   obtenerDatosFormularioCita
 } from '../Service/CrearCitaService.js';
 import { ajustarCampoHora } from '../../horarioCitas.js';
+import { revisar, avisoValidacion } from '../../validaciones.js';
 
 // Crea un modal compatible: usa Bootstrap cuando está disponible y una alternativa local si el CDN falla.
 function createCompatibleModal(modalElement, options = {}) {
@@ -169,6 +170,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     form.classList.add('was-validated');
     if (!form.checkValidity()) {
       form.reportValidity();
+      return;
+    }
+
+    const problema = revisar([
+      { el: subjectInput, nombre: "asunto", tipo: "texto", min: 3, max: 250 },
+      { el: descriptionInput, nombre: "descripción", tipo: "texto", max: 300, opcional: true }
+    ]);
+
+    if (problema) {
+      avisoValidacion(problema);
       return;
     }
 

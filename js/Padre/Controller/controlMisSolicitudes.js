@@ -6,6 +6,7 @@ import {
   eliminarSolicitud,
   obtenerDocentes
 } from "../Service/MisSolicitudesService.js";
+import { revisarValor } from "../../validaciones.js";
 
 const contenedor = document.getElementById("contenedor-solicitudes");
 
@@ -234,13 +235,10 @@ async function abrirEdicion(idCita) {
         motivo: document.getElementById("swalMotivo").value.trim()
       };
 
-      if (!valores.motivo) {
-        Swal.showValidationMessage("Debe indicar el motivo de la visita.");
-        return false;
-      }
+      const problemaMotivo = revisarValor(valores.motivo, { nombre: "motivo de la visita", tipo: "texto", min: 5, max: 250 });
 
-      if (valores.motivo.length > 250) {
-        Swal.showValidationMessage("El motivo no puede exceder 250 caracteres.");
+      if (problemaMotivo) {
+        Swal.showValidationMessage(problemaMotivo);
         return false;
       }
 
@@ -335,8 +333,10 @@ async function abrirPosponer(idCita) {
         return false;
       }
 
-      if (!valores.motivo) {
-        Swal.showValidationMessage("Debe indicar el motivo de la reprogramación.");
+      const problemaMotivo = revisarValor(valores.motivo, { nombre: "motivo", tipo: "texto", min: 5, max: 280 });
+
+      if (problemaMotivo) {
+        Swal.showValidationMessage(problemaMotivo);
         return false;
       }
 
