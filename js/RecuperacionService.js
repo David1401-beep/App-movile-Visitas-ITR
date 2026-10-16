@@ -25,7 +25,7 @@ async function pedir(ruta, cuerpo) {
   const contenido = await respuesta.json().catch(() => null);
 
   if (!respuesta.ok) {
-    return { exito: false, mensaje: primerError(contenido) };
+    return { exito: false, estado: respuesta.status, mensaje: primerError(contenido) };
   }
 
   return { exito: true, mensaje: contenido?.message };

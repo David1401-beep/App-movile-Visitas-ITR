@@ -49,12 +49,16 @@ document.addEventListener("DOMContentLoaded", function () {
     await conBoton(btnEnviar, "Enviando...", async function () {
       const resultado = await solicitarCodigo(correo);
 
+      // Si el correo no existe se queda en este paso y lo avisa, en vez de
+      // pasar a pedir un codigo que nunca va a llegar.
       if (!resultado.exito) {
-        mostrarError(resultado.mensaje);
+        avisarError(
+          resultado.mensaje,
+          resultado.estado === 404 ? "Correo no registrado" : "No se pudo enviar el código"
+        );
         return;
       }
 
-      // La API responde igual exista o no el correo.
       mostrarAviso(resultado.mensaje);
       mostrarPaso(formCodigo);
       inputCodigo.focus();
@@ -157,6 +161,17 @@ document.addEventListener("DOMContentLoaded", function () {
   function mostrarError(texto) {
     mensaje.textContent = texto;
     mensaje.className = "text-center small mb-0 mt-2 text-danger";
+  }
+
+  // Error en ventana de SweetAlert. Si no llego a cargar, usa el modal propio
+  // de validaciones.js, para que nunca quede como texto suelto en la pagina.
+  function avisarError(texto, titulo) {
+    if (window.Swal) {
+      Swal.fire({ icon: "error", title: titulo, text: texto });
+      return;
+    }
+
+    avisoValidacion(texto);
   }
 
   function mostrarAviso(texto) {
