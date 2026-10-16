@@ -2974,3 +2974,37 @@ body.convocations-page {
 
 .modal-validacion-boton:hover,
 .modal-validacion-boton:focus-visible { background-color: #e7b700; }
+
+/* Ojo para ver la contraseña. Lo arma js/verContrasena.js alrededor de cada
+   campo de contraseña. El color lo toma del texto del campo. */
+.campo-contrasena {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.btn-ver-contrasena {
+  position: absolute;
+  top: 50%;
+  right: 0.55rem;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: transparent;
+  font-size: 1.1rem;
+  line-height: 1;
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.btn-ver-contrasena:hover,
+.btn-ver-contrasena:focus-visible {
+  opacity: 1;
+  background-color: rgba(127, 127, 127, 0.2);
+}
