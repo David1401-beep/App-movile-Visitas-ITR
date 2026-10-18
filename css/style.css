@@ -2976,7 +2976,8 @@ body.convocations-page {
 .modal-validacion-boton:focus-visible { background-color: #e7b700; }
 
 /* Ojo para ver la contraseña. Lo arma js/verContrasena.js alrededor de cada
-   campo de contraseña. El color lo toma del texto del campo. */
+   campo de contraseña y le pone "sobre-oscuro" o "sobre-claro" segun el
+   fondo del campo. */
 .campo-contrasena {
   position: relative;
   display: block;
@@ -2999,12 +3000,39 @@ body.convocations-page {
   background-color: transparent;
   font-size: 1.1rem;
   line-height: 1;
-  opacity: 0.8;
   cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
 }
 
-.btn-ver-contrasena:hover,
-.btn-ver-contrasena:focus-visible {
-  opacity: 1;
-  background-color: rgba(127, 127, 127, 0.2);
+.btn-ver-contrasena.sobre-oscuro { color: #e5e7eb; }
+
+.btn-ver-contrasena.sobre-oscuro:hover,
+.btn-ver-contrasena.sobre-oscuro:focus-visible {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+.btn-ver-contrasena.sobre-claro { color: #4b5563; }
+
+.btn-ver-contrasena.sobre-claro:hover,
+.btn-ver-contrasena.sobre-claro:focus-visible {
+  color: #111827;
+  background-color: rgba(17, 24, 39, 0.08);
+}
+
+/* Cuando el navegador autocompleta la contraseña pinta el campo de claro,
+   asi que el ojo pasa a oscuro aunque el campo sea de los oscuros. Van en
+   reglas separadas porque si un navegador no entiende uno de los dos nombres
+   descartaria la regla entera. */
+.campo-contrasena:has(input:-webkit-autofill) .btn-ver-contrasena { color: #1f2937; }
+.campo-contrasena:has(input:autofill) .btn-ver-contrasena { color: #1f2937; }
+
+.campo-contrasena:has(input:-webkit-autofill) .btn-ver-contrasena:hover {
+  color: #111827;
+  background-color: rgba(17, 24, 39, 0.1);
+}
+
+.campo-contrasena:has(input:autofill) .btn-ver-contrasena:hover {
+  color: #111827;
+  background-color: rgba(17, 24, 39, 0.1);
 }

@@ -10,6 +10,20 @@ function cambiarIcono(boton, visible) {
   boton.setAttribute("aria-pressed", String(visible));
 }
 
+// Dice si el campo es oscuro mirando su fondo. Si el fondo es transparente se
+// guia por el texto: letra clara quiere decir campo oscuro.
+function campoOscuro(estilo) {
+  const fondo = estilo.backgroundColor.match(/[\d.]+/g)?.map(Number) || [];
+  const texto = estilo.color.match(/[\d.]+/g)?.map(Number) || [];
+  const brillo = ([r, g, b]) => (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+  if (fondo.length >= 3 && (fondo[3] ?? 1) > 0.5) {
+    return brillo(fondo) < 0.5;
+  }
+
+  return texto.length >= 3 && brillo(texto) > 0.6;
+}
+
 function agregarOjo(input) {
   if (input.dataset.conOjo) {
     return;
@@ -39,10 +53,11 @@ function agregarOjo(input) {
 
   const boton = document.createElement("button");
   boton.type = "button";
-  boton.className = "btn-ver-contrasena";
-  // Del mismo color que el texto del campo: claro en los campos oscuros y
-  // oscuro en los claros.
-  boton.style.color = estilo.color;
+  // Colores fijos segun el fondo: claro en los campos oscuros y oscuro en los
+  // claros. Antes copiaba el color del texto al cargar, y cuando el navegador
+  // autocompletaba la contraseña (pinta el campo de celeste) el ojo quedaba
+  // blanco sobre claro y casi no se veia. El CSS cubre ese caso.
+  boton.className = `btn-ver-contrasena ${campoOscuro(estilo) ? "sobre-oscuro" : "sobre-claro"}`;
   cambiarIcono(boton, false);
 
   boton.addEventListener("click", function () {
