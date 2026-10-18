@@ -34,6 +34,12 @@
 
                 <div class="request-field teacher-field" id="campo-contenedor-docente">
                     <label class="form-label" id="etiqueta-docente" for="docente">Docente</label>
+                    <div class="buscador-lista" id="contenedor-buscar-docente">
+                        <i class="bi bi-search" aria-hidden="true"></i>
+                        <input type="search" class="form-control" id="buscar-docente"
+                            placeholder="Buscar docente por nombre" aria-label="Buscar docente por nombre"
+                            autocomplete="off" disabled>
+                    </div>
                     <select class="request-control request-select form-select" id="docente" name="teacher" required disabled>
                         <option value="">Cargando docentes...</option>
                     </select>

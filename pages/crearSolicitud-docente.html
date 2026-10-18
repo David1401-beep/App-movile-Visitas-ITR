@@ -52,6 +52,12 @@
 
                 <div class="request-field" id="campo-estudiante">
                     <label class="form-label" id="etiqueta-estudiante" for="estudiante-seleccionado">Estudiante</label>
+                    <div class="buscador-lista" id="contenedor-buscar-estudiante">
+                        <i class="bi bi-search" aria-hidden="true"></i>
+                        <input type="search" class="form-control" id="buscar-estudiante"
+                            placeholder="Buscar estudiante o encargado" aria-label="Buscar estudiante o encargado"
+                            autocomplete="off" disabled>
+                    </div>
                     <select class="request-control request-select form-select" id="estudiante-seleccionado" name="teacher" required>
                         <option id="opcion-predeterminada" value="" selected>Cargando estudiantes...</option>
                     </select>

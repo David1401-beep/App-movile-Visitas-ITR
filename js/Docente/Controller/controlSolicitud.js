@@ -5,6 +5,7 @@ import {
 } from '../Service/CrearCitaService.js';
 import { ajustarCampoHora } from '../../horarioCitas.js';
 import { revisar, avisoValidacion } from '../../validaciones.js';
+import { conectarBuscador } from '../../buscadorLista.js';
 
 // Crea un modal compatible: usa Bootstrap cuando está disponible y una alternativa local si el CDN falla.
 function createCompatibleModal(modalElement, options = {}) {
@@ -106,7 +107,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       datosFormulario.relaciones.forEach((relacion) => {
         const option = document.createElement('option');
         option.value = relacion.idEstudianteEncargado;
-        option.textContent = relacion.nombreEstudiante;
+        // Con el encargado al lado se puede buscar por cualquiera de los dos.
+        option.textContent = relacion.nombreEncargado
+          ? `${relacion.nombreEstudiante} — ${relacion.nombreEncargado}`
+          : relacion.nombreEstudiante;
         option.dataset.idEstudiante = relacion.idEstudiante;
         studentSelect.appendChild(option);
       });
@@ -121,6 +125,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       studentSelect.disabled = false;
       submitButton.disabled = false;
       showStatus('');
+
+      conectarBuscador(document.getElementById('buscar-estudiante'), studentSelect, {
+        singular: 'estudiante',
+        plural: 'estudiantes'
+      });
     } catch (error) {
       studentSelect.innerHTML = '<option value="">No fue posible cargar estudiantes</option>';
     }

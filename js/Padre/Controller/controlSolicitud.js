@@ -4,6 +4,7 @@ import {
 } from '../Service/SolicitudPadreService.js';
 import { horarioDeLaFecha, ajustarCampoHora } from '../../horarioCitas.js';
 import { revisar, avisoValidacion } from '../../validaciones.js';
+import { conectarBuscador } from '../../buscadorLista.js';
 
 // Controla la validación y el modal de confirmación del formulario de solicitudes.
 document.addEventListener('DOMContentLoaded', () => {
@@ -218,6 +219,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     guardianSelect.disabled = false;
     teacherSelect.disabled = false;
     submitButton.disabled = false;
+
+    // Hay muchos docentes: se busca escribiendo el nombre.
+    conectarBuscador(document.getElementById('buscar-docente'), teacherSelect, {
+      singular: 'docente',
+      plural: 'docentes'
+    });
   } catch (error) {
     // Si las listas no cargan hay que decir por que: antes la pantalla se
     // quedaba en "Cargando..." sin explicar nada.

@@ -502,6 +502,38 @@ body {
   background-color: #1d2939;
 }
 
+/* Buscador arriba de las listas largas (docentes, estudiantes). Es claro
+   para que se distinga de la lista oscura que tiene abajo. */
+.buscador-lista {
+  position: relative;
+  margin-bottom: 6px;
+}
+
+.buscador-lista .bi-search {
+  position: absolute;
+  top: 50%;
+  left: 13px;
+  transform: translateY(-50%);
+  color: #6b7280;
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+
+.buscador-lista .form-control {
+  min-height: 35px;
+  padding: 6px 14px 6px 34px;
+  border: 1px solid #d0d5dd;
+  border-radius: 11px;
+  background-color: #ffffff;
+  color: #1d2939;
+  font-size: 0.875rem;
+}
+
+.buscador-lista .form-control:focus {
+  border-color: #1d2939;
+  box-shadow: 0 0 0 0.15rem rgba(29, 41, 57, 0.15);
+}
+
 /* Campo de fecha con forma de cápsula. */
 .request-date {
   min-height: 35px;
